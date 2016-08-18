@@ -13,13 +13,13 @@
     tools:showIn="@layout/activity_favs_list">
 
     <ListView
+        android:id="@+id/favesLV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/favsLocationsLV"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:divider="@drawable/horiz_space_20"
-        android:showDividers="middle"/>
+        android:showDividers="middle" />
 
 
 </RelativeLayout>
