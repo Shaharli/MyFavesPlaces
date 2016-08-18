@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MyFaves</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_favs_list">FavsListActivity</string>
+    <string name="Google_APIKEY_Geocoding">AIzaSyD-q3jR4YAwrGTTCMiZxUO4d2sFcYjy910</string>
+    <string name="search">Search</string>
+
+    <string name="api_google_places_key">AIzaSyB2eNueotW9eTU2scgoiGd-KjpvRfWmKHM</string>
+
+</resources>
