@@ -10,7 +10,6 @@
 
     <Preference
         android:key="clear"
-        android:summary="Click here to clean your favorite places list"
         android:title="Clear Faves List" />
 
     <Preference

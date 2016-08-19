@@ -4,7 +4,6 @@ package com.avigezerit.myfaves.View;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
@@ -19,20 +18,18 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.avigezerit.myfaves.Control.LoadMapIF;
 import com.avigezerit.myfaves.Control.addToFavoritesReceiver;
-import com.avigezerit.myfaves.Control.mService;
 import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.R;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.net.URLEncoder;
-
 
 public class PlaceListFragment extends Fragment implements View.OnClickListener, ListView.OnItemClickListener, LoaderManager.LoaderCallbacks {
+
+    private static final String TAG = PlaceListFragment.class.getSimpleName();
 
     //xml ref
     EditText searchTermET;
@@ -53,17 +50,11 @@ public class PlaceListFragment extends Fragment implements View.OnClickListener,
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_place_list, container, false);
-
-        //bind to xml
-        searchTermET = (EditText) v.findViewById(R.id.searchPlaceET);
-        startSearchBtn = (Button) v.findViewById(R.id.activateSearchBtn);
-        startSearchBtn.setOnClickListener(this);
 
         Cursor cursor = null;
         adapter = new myFavesCursorAdapter(getActivity(), cursor);
@@ -106,6 +97,7 @@ public class PlaceListFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClick(View v) {
 
+        /*
         //get text from edit text
         searchTermFromET = searchTermET.getText().toString();
 
@@ -120,6 +112,7 @@ public class PlaceListFragment extends Fragment implements View.OnClickListener,
         Intent intent = new Intent(getActivity(), mService.class);
         intent.putExtra("term", searchTermEncoded);
         getActivity().startService(intent);
+        */
 
     }
 

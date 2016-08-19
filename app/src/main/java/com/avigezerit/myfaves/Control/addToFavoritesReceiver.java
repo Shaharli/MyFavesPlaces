@@ -38,11 +38,15 @@ public class addToFavoritesReceiver extends BroadcastReceiver {
 
         if (isFav == 1) {
             cv.put(dbm.COL_ISFAV_6, 0);
+            myFavesCursorAdapter.changeFavOption(0);
         } else {
             cv.put(dbm.COL_ISFAV_6, 1);
+            myFavesCursorAdapter.changeFavOption(1);
         }
 
         context.getContentResolver().update(uri, cv, dbc.COL_ID_0 + "=?", whereArgs);
         context.getContentResolver().notifyChange(uri, null);
+
+        c.close();
     }
 }

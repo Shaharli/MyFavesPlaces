@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".View.SettingsActivity"/>
+        <activity android:name=".View.SettingsActivity" android:theme="@style/Theme.AppCompat.Dialog"/>
     </application>
 
 </manifest>

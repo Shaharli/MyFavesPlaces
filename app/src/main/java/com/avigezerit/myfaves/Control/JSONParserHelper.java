@@ -30,8 +30,8 @@ public class JSONParserHelper {
         Uri uri = dbContract.mPlacesTable.CONTENT_URI;
 
         //delete all current results beside favs
-        //String[] whereArgs = new String[]{""+0};
-        cx.getContentResolver().delete(uri, null, null);
+        String[] whereArgs = new String[]{""+0};
+        cx.getContentResolver().delete(uri, dbc.COL_ISFAV_6+"=?", whereArgs);
 
         try {
 

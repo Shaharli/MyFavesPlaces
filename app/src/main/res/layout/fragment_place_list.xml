@@ -5,21 +5,6 @@
     android:orientation="vertical"
     tools:context=".View.PlaceListFragment">
 
-    <EditText
-        android:id="@+id/searchPlaceET"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:imeOptions="actionSearch"
-        android:singleLine="true"/>
-
-    <Button
-        android:id="@+id/activateSearchBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/search" />
-
     <ListView
         android:id="@+id/searchPlacesResultLV"
         android:layout_width="match_parent"

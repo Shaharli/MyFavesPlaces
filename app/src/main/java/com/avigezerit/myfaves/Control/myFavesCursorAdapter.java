@@ -3,8 +3,8 @@ package com.avigezerit.myfaves.Control;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +16,14 @@ import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.Model.dbm;
 import com.avigezerit.myfaves.Place;
 import com.avigezerit.myfaves.R;
-import com.avigezerit.myfaves.favPosition;
+import com.avigezerit.myfaves.getLocationHelper;
 import com.squareup.picasso.Picasso;
 
 /* * * * * * * * * * * * * FAV LIST CURSOR ADAPTER - MAIN * * * * * * * * * * * * */
 
 public class myFavesCursorAdapter extends CursorAdapter {
+
+    private static final String TAG = myFavesCursorAdapter.class.getSimpleName();
 
     Context context;
     View view;
@@ -29,13 +31,14 @@ public class myFavesCursorAdapter extends CursorAdapter {
     Place p = new Place();
 
     private dbContract.mPlacesTable dbc;
+    Uri uri = dbContract.mPlacesTable.CONTENT_URI;
 
     //saveMyLocation
     private double myLocationLati;
     private double MyLocationLongi;
 
     //
-    ImageView favIcon;
+    static ImageView favIcon;
     int mIsFav;
 
     static long itemFavedId;
@@ -76,10 +79,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
         double flLati = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LATITUDE_2));
         double flLongi = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LONGITUDE_3));
 
-        if (mIsFav == 1) {
-            favIcon.setImageResource(R.drawable.ic_favorite_filled);
-        } else
-            favIcon.setImageResource(R.drawable.ic_favorite_border);
+        changeFavOption(mIsFav);
 
         if (mImage != null) {
 
@@ -97,12 +97,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
             @Override
             public void onClick(View v) {
 
-                //TODO CLEAN LOGS
-                Log.d("FAVORITES: ", " clicked on fav icon");
-                Log.d("ID CLICKED: ", "" + v.getId());
-
                 addToFav(p.getId());
-
             }
         });
 
@@ -115,7 +110,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
         Double[] currentPositionCoords = new Double[]{myLocationLati, MyLocationLongi};
 
         //TO DONE: calculate distance
-        String mDistance = favPosition.getDisfromAtoB(currentPositionCoords, favPositionCoords);
+        String mDistance = getLocationHelper.getDisfromAtoB(currentPositionCoords, favPositionCoords);
 
         //TODO: load image from url path
 
@@ -125,18 +120,27 @@ public class myFavesCursorAdapter extends CursorAdapter {
 
     }
 
+    public static void changeFavOption(int mIsFav) {
 
-    public void addToFav(int _id){
+        if (mIsFav == 1) {
+            favIcon.setImageResource(R.drawable.ic_favorite_filled);
+        } else if (mIsFav == 0) {
+            favIcon.setImageResource(R.drawable.ic_favorite_border);
+        }
+    }
+
+
+    public void addToFav(int _id) {
 
         Intent intent = new Intent(dbc.ACTION_FAVED);
-        intent.putExtra("_id",_id);
+        intent.putExtra("_id", _id);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 
     private void getCurrentPositionToCalcDistance() {
 
-        favPosition currentPosition = new favPosition();
+        getLocationHelper currentPosition = new getLocationHelper();
         currentPosition.setContext(context);
         Double[] coords = currentPosition.getPositionOfMyLocation();
 

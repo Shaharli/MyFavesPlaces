@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.View.SearchActivity;
+import com.avigezerit.myfaves.View.SettingsActivity;
 
 /* * * * * * * * * * * * * FAVORITE PLACES LIST ACTIVITY - MAIN * * * * * * * * * * * * */
 
@@ -83,6 +85,29 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         getMenuInflater().inflate(R.menu.fav_menu, menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.settings:
+                Intent gotoSettings = new Intent(FavesListActivity.this, SettingsActivity.class);
+                startActivity(gotoSettings);
+                break;
+            case R.id.faves:
+                Intent gotoFaves = new Intent(FavesListActivity.this, FavesListActivity.class);
+                startActivity(gotoFaves);
+                break;
+        }
+
+        return true;
     }
 
     @Override

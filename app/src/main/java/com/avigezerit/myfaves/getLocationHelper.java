@@ -19,12 +19,12 @@ import java.util.Locale;
 
 /* * * * * * * * * * * * * FAV POSISITION MANAGER POJO * * * * * * * * * * * * */
 
-public class favPosition implements LocationListener {
+public class getLocationHelper implements LocationListener {
 
-    private static final String TAG = favPosition.class.getSimpleName();
+    private static final String TAG = getLocationHelper.class.getSimpleName();
 
     //permission
-    private static final int REQUEST_PERMISSION = 101;
+    private static final int REQUEST_GPS_PERMISSION = 101;
 
     //get location
     private LocationManager locationManager;
@@ -35,14 +35,8 @@ public class favPosition implements LocationListener {
     private double mLati;
     private double mLongi;
 
-    public favPosition() {
+    public getLocationHelper() {
     }
-
-    public favPosition(double mLati, double mLongi) {
-        this.mLati = mLati;
-        this.mLongi = mLongi;
-    }
-
 
     public void setContext(Context context) {
         this.context = context;
@@ -116,14 +110,14 @@ public class favPosition implements LocationListener {
     }
 
     //TODO use api
-    public String getAddressFromLL(favPosition favPosition){
+    public String getAddressFromLL(getLocationHelper getLocationHelper){
 
         Geocoder geocoder;
         List<Address> addresses = null;
         geocoder = new Geocoder(context, Locale.getDefault());
 
         try {
-            addresses = geocoder.getFromLocation(favPosition.getLati(), favPosition.getLongi(), 1);
+            addresses = geocoder.getFromLocation(getLocationHelper.getLati(), getLocationHelper.getLongi(), 1);
         } catch (IOException e) {
             e.printStackTrace();
         }

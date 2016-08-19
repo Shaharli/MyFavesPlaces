@@ -12,6 +12,8 @@ import android.util.Log;
  */
 public class dbProvider extends ContentProvider {
 
+    private static final String TAG = dbProvider.class.getSimpleName();
+
     private dbContract.mPlacesTable dbc;
 
     dbHelper dbh;
@@ -44,7 +46,7 @@ public class dbProvider extends ContentProvider {
 
         //adding the given place to db
         dbh.getWritableDatabase().insert(dbContract.mPlacesTable.PLACES, null, values);
-        Log.d("DB added place : ", values.getAsString(dbc.COL_NAME_1) + " / " + values.get(dbc.COL_ADDRESS_4));
+        Log.d(TAG, "DB added place : "+  values.getAsString(dbc.COL_NAME_1) + " / " + values.get(dbc.COL_ADDRESS_4));
         getContext().getContentResolver().notifyChange(uri, null);
         return uri;
     }
@@ -60,7 +62,7 @@ public class dbProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
         int rowsUpdated = dbh.getWritableDatabase().update(dbContract.mPlacesTable.PLACES, values, selection, selectionArgs);
-        Log.d("DB Faved : ", ""+values.get(dbc.COL_ISFAV_6));
+        Log.d(TAG, "DB Faved : "+""+values.get(dbc.COL_ISFAV_6));
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsUpdated;
     }

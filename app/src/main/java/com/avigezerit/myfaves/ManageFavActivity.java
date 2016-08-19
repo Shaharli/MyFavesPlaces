@@ -87,7 +87,7 @@ public class ManageFavActivity extends AppCompatActivity implements View.OnClick
 
     private void getMyPosition() {
 
-        favPosition tempPosition = new favPosition();
+        getLocationHelper tempPosition = new getLocationHelper();
         tempPosition.setContext(ManageFavActivity.this);
         tempPosition.getPositionOfMyLocation();
 
