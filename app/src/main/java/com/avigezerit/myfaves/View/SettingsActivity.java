@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.avigezerit.myfaves.FavesListActivity;
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.R;
 
@@ -85,11 +84,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             //exit
             finish();
         } else if (key.equals("clear")) {
-            //clear: activate clear list listener
-            Toast.makeText(this, "Faves List Cleared!", Toast.LENGTH_SHORT).show();
             //delete all faves
             String[] whereArgs = new String[]{""+1};
-            getContentResolver().delete(uri, dbc.COL_ISFAV_6+"=?", whereArgs);
+            int rowsDeleted = getContentResolver().delete(uri, dbc.COL_ISFAV_6+"=?", whereArgs);
+            Toast.makeText(this, ""+rowsDeleted+" favorites deleted!", Toast.LENGTH_SHORT).show();
+
         }
 
         return true;
@@ -110,7 +109,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 startActivity(gotoSettings);
                 break;
             case R.id.faves:
-                Intent gotoFaves = new Intent(SettingsActivity.this, FavesListActivity.class);
+                Intent gotoFaves = new Intent(SettingsActivity.this, favesListActivity.class);
                 startActivity(gotoFaves);
                 break;
         }

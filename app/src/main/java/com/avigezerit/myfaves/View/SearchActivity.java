@@ -1,10 +1,20 @@
 package com.avigezerit.myfaves.View;
 
+import android.Manifest;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -15,8 +25,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.avigezerit.myfaves.Control.LoadMapIF;
+import com.avigezerit.myfaves.Control.checkPermissionsHelper;
 import com.avigezerit.myfaves.Control.mService;
-import com.avigezerit.myfaves.FavesListActivity;
 import com.avigezerit.myfaves.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +38,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.URLEncoder;
 
-public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener {
+public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener, android.location.LocationListener {
+
+    private static final String TAG = SearchActivity.class.getSimpleName();
 
     //fragments
     FragmentManager manager;
@@ -38,6 +50,14 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     EditText searchTermET;
     String searchTermFromET;
     Button startSearchBtn;
+
+    //location
+
+    checkPermissionsHelper helper;
+    private static final int REQUEST_GPS_PERMISSION = 101;
+    private LocationManager locationManager;
+    private String provider;
+    Location mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +71,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         transaction = manager.beginTransaction();
 
         //check orientation
-        if (isLanscapeMode()){
+        if (isLanscapeMode()) {
             MapFragment map = new MapFragment();
             transaction.add(R.id.MapFragContainerLL, map);
             transaction.add(R.id.listFragContainerLL, list);
@@ -64,6 +84,11 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         startSearchBtn = (Button) findViewById(R.id.activateSearchBtn);
         startSearchBtn.setOnClickListener(this);
 
+
+        //requestPermission();
+
+        //requestLocationUpdates();
+
     }
 
     public boolean isLanscapeMode() {
@@ -72,13 +97,13 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
         int orientation = getResources().getConfiguration().orientation;
 
-        switch (orientation){
-            case  Configuration.ORIENTATION_LANDSCAPE:
-                Log.d("my orient" ,"ORIENTATION_LANDSCAPE");
+        switch (orientation) {
+            case Configuration.ORIENTATION_LANDSCAPE:
+                Log.d("my orient", "ORIENTATION_LANDSCAPE");
                 isLanscapeMode = true;
                 break;
             case Configuration.ORIENTATION_PORTRAIT:
-                Log.d("my orient" ,"ORIENTATION_PORTRAIT");
+                Log.d("my orient", "ORIENTATION_PORTRAIT");
                 isLanscapeMode = false;
                 break;
         }
@@ -109,7 +134,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
             }
         });
 
-        if (isLanscapeMode()){
+        if (isLanscapeMode()) {
             transaction.replace(R.id.MapFragContainerLL, mapFragment).commit();
         } else {
             transaction.replace(R.id.containerSearchLL, mapFragment, "map").addToBackStack("loadMap").commit();
@@ -141,7 +166,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
                 startActivity(gotoSettings);
                 break;
             case R.id.faves:
-                Intent gotoFaves = new Intent(SearchActivity.this, FavesListActivity.class);
+                Intent gotoFaves = new Intent(SearchActivity.this, favesListActivity.class);
                 startActivity(gotoFaves);
                 break;
         }
@@ -164,7 +189,99 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
             Intent intent = new Intent(this, mService.class);
             intent.putExtra("term", searchTermEncoded);
             startService(intent);
+        } else Toast.makeText(this, "Search with at least 2 letters", Toast.LENGTH_SHORT);
+    }
+
+
+    private void requestPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_GPS_PERMISSION);
         }
-        else  Toast.makeText(this, "Search with at least 2 letters", Toast.LENGTH_SHORT);
+    }
+
+    private void requestLocationUpdates() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
+
+            //get the best location-provider that matches a certain criteria
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            criteria.setPowerRequirement(Criteria.POWER_HIGH);
+
+            //set to provider
+            provider = locationManager.getBestProvider(criteria, true);
+
+            Log.d(TAG, "Provider: " + provider);
+
+            locationManager.requestLocationUpdates(provider, 40000, 0, this);
+
+        }
+
+    }
+
+    private void removeLocationUpdates() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_GPS_PERMISSION);
+        }
+        //locationManager.removeUpdates(this);
+        Log.d(TAG, "Removed updates");
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //removeLocationUpdates();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        mLocation = location;
+        Log.d(TAG, "lati: " + location.getLatitude() + " longi: " + location.getLongitude());
+
+        //setting location to Place
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("lati", String.valueOf(location.getLatitude()));
+        editor.putString("longi", String.valueOf(location.getLongitude()));
+        editor.apply();
+        editor.commit();
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_GPS_PERMISSION) {
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Granted! ");
+                requestLocationUpdates();
+
+            } else {
+                //helper.alarmUser();
+            }
+        }
     }
 }
+
+

@@ -43,12 +43,6 @@ public class ManageFavActivity extends AppCompatActivity implements View.OnClick
         useLocationBtn = (Button) findViewById(R.id.useLocationBtn);
         useLocationBtn.setOnClickListener(this);
 
-
-        //header fragment
-        HeaderFragment header = HeaderFragment.newInstance("Location Details");
-
-        getFragmentManager().beginTransaction().add(R.id.headerFragmentLL, header).commit();
-
     }
 
 
@@ -87,6 +81,7 @@ public class ManageFavActivity extends AppCompatActivity implements View.OnClick
 
     private void getMyPosition() {
 
+        /*
         getLocationHelper tempPosition = new getLocationHelper();
         tempPosition.setContext(ManageFavActivity.this);
         tempPosition.getPositionOfMyLocation();
@@ -105,7 +100,9 @@ public class ManageFavActivity extends AppCompatActivity implements View.OnClick
         getLocationAgain.setVisibility(View.VISIBLE);
         getLocationAgain.setOnClickListener(this);
 
-        //TODO get Address autoComplete
+        //TODO get Address autoComplete\
+
+        */
 
     }
 

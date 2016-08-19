@@ -34,7 +34,16 @@
             android:text="Title" />
 
         <TextView
-            android:id="@+id/flDistanceTV"
+            android:id="@+id/distanceTV"
+            style="@style/smallText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="10sp"
+            android:text="distance" />
+
+        <TextView
+            android:id="@+id/placeAddressTV"
             style="@style/smallText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -55,6 +55,7 @@ public class dbProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
 
         int rowsDeleted = dbh.getWritableDatabase().delete(dbContract.mPlacesTable.PLACES, selection, selectionArgs);
+        getContext().getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
     }
 

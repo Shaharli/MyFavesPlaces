@@ -16,7 +16,6 @@ import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.Model.dbm;
 import com.avigezerit.myfaves.Place;
 import com.avigezerit.myfaves.R;
-import com.avigezerit.myfaves.getLocationHelper;
 import com.squareup.picasso.Picasso;
 
 /* * * * * * * * * * * * * FAV LIST CURSOR ADAPTER - MAIN * * * * * * * * * * * * */
@@ -41,8 +40,6 @@ public class myFavesCursorAdapter extends CursorAdapter {
     static ImageView favIcon;
     int mIsFav;
 
-    static long itemFavedId;
-
 
     public myFavesCursorAdapter(Context context, Cursor c) {
         super(context, c);
@@ -64,7 +61,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
         //TO DONE: ref to xml
         TextView flNameTV = (TextView) view.findViewById(R.id.flNameTV);
         //TextView flAddressTV = (TextView) view.findViewById(R.id.flDistanceTV);
-        TextView flDistanceTV = (TextView) view.findViewById(R.id.flDistanceTV);
+        TextView flDistanceTV = (TextView) view.findViewById(R.id.placeAddressTV);
         ImageView flPicIV = (ImageView) view.findViewById(R.id.flPicIV);
         favIcon = (ImageView) view.findViewById(R.id.favIV);
 
@@ -110,11 +107,9 @@ public class myFavesCursorAdapter extends CursorAdapter {
         Double[] currentPositionCoords = new Double[]{myLocationLati, MyLocationLongi};
 
         //TO DONE: calculate distance
-        String mDistance = getLocationHelper.getDisfromAtoB(currentPositionCoords, favPositionCoords);
+        //String mDistance = getLocationHelper.getDisfromAtoB(currentPositionCoords, favPositionCoords);
 
-        //TODO: load image from url path
-
-        //TO DONE: set values
+        //set values
         flNameTV.setText(mName);
         flDistanceTV.setText(mAddress);
 
@@ -140,12 +135,12 @@ public class myFavesCursorAdapter extends CursorAdapter {
 
     private void getCurrentPositionToCalcDistance() {
 
-        getLocationHelper currentPosition = new getLocationHelper();
-        currentPosition.setContext(context);
-        Double[] coords = currentPosition.getPositionOfMyLocation();
+        //getLocationHelper currentPosition = new getLocationHelper();
+        //currentPosition.setContext(context);
+        //Double[] coords = currentPosition.getPositionOfMyLocation();
 
-        myLocationLati = coords[0];
-        MyLocationLongi = coords[1];
+        //myLocationLati = coords[0];
+        //MyLocationLongi = coords[1];
 
     }
 }

@@ -66,9 +66,6 @@ public class JSONParserHelper {
                 double mLati = resultObjectLocation.getDouble("lat");
                 double mLongi = resultObjectLocation.getDouble("lng");
 
-                //TODO IMAGE
-
-
                 String mImage = null;
 
                 try {
@@ -79,9 +76,7 @@ public class JSONParserHelper {
                     String photo_ref = photoObject.getString("photo_reference");
                     mImage = GoogleAPIRequest.getPhotoUrl(photo_ref);
 
-                } catch (JSONException e) {
-                }
-
+                } catch (JSONException e) {}
 
                 //print to log
                 Log.d(TAG, "This is a place: " + mName + " " + mAddress + " " + mLati + " " + mLongi);

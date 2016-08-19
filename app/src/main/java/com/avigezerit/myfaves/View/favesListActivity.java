@@ -1,4 +1,4 @@
-package com.avigezerit.myfaves;
+package com.avigezerit.myfaves.View;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -17,12 +17,11 @@ import android.widget.ListView;
 
 import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
-import com.avigezerit.myfaves.View.SearchActivity;
-import com.avigezerit.myfaves.View.SettingsActivity;
+import com.avigezerit.myfaves.R;
 
 /* * * * * * * * * * * * * FAVORITE PLACES LIST ACTIVITY - MAIN * * * * * * * * * * * * */
 
-public class FavesListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
+public class favesListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
     myFavesCursorAdapter adapter;
     Uri uri = dbContract.mPlacesTable.CONTENT_URI;
@@ -43,12 +42,10 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
             @Override
             public void onClick(View view) {
 
-                Intent goToSearch = new Intent(FavesListActivity.this, SearchActivity.class);
+                Intent goToSearch = new Intent(favesListActivity.this, SearchActivity.class);
                 startActivity(goToSearch);
             }
         });
-
-        //TODO Show only faves
 
         Cursor cursor = null;
         adapter = new myFavesCursorAdapter(this, cursor);
@@ -71,10 +68,9 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-
         Cursor c = (Cursor) data;
-        c.setNotificationUri(getContentResolver(), uri);
         adapter.swapCursor(c);
+        c.setNotificationUri(getContentResolver(), uri);
     }
 
     @Override
@@ -98,11 +94,11 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
 
         switch (item.getItemId()) {
             case R.id.settings:
-                Intent gotoSettings = new Intent(FavesListActivity.this, SettingsActivity.class);
+                Intent gotoSettings = new Intent(favesListActivity.this, SettingsActivity.class);
                 startActivity(gotoSettings);
                 break;
             case R.id.faves:
-                Intent gotoFaves = new Intent(FavesListActivity.this, FavesListActivity.class);
+                Intent gotoFaves = new Intent(favesListActivity.this, favesListActivity.class);
                 startActivity(gotoFaves);
                 break;
         }
