@@ -84,12 +84,13 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF {
 
         switch (item.getItemId()){
             case R.id.settings:
-                //TODO open settings
+                Intent gotoSettings = new Intent(SearchActivity.this, SettingsActivity.class);
+                startActivity(gotoSettings);
                 break;
             case R.id.faves:
                 //TODO faves
-                Intent intent = new Intent(SearchActivity.this, FavesListActivity.class);
-                startActivity(intent);
+                Intent gotoFaves = new Intent(SearchActivity.this, FavesListActivity.class);
+                startActivity(gotoFaves);
                 break;
         }
 

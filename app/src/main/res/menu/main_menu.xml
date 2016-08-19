@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/settings"
-        android:title="Settings"/>
+    <item
+        android:id="@+id/settings"
+        android:title="Settings" />
 
-    <item android:id="@+id/faves"
-        android:title="My Faves"/>
+    <item
+        android:id="@+id/faves"
+        android:title="My Faves" />
 
 </menu>

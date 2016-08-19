@@ -64,7 +64,6 @@ public class myFavesCursorAdapter extends CursorAdapter {
         TextView flDistanceTV = (TextView) view.findViewById(R.id.flDistanceTV);
         ImageView flPicIV = (ImageView) view.findViewById(R.id.flPicIV);
         favIcon = (ImageView) view.findViewById(R.id.favIV);
-        ImageView mapIcon = (ImageView) view.findViewById(R.id.mapIV);
 
         //TO DONE: binding data from cursor to view
         String mName = cursor.getString(cursor.getColumnIndex(dbc.COL_NAME_1));
@@ -93,7 +92,6 @@ public class myFavesCursorAdapter extends CursorAdapter {
 
         p.setId(mId);
         p.setFav(false);
-
         //onClick favIcon
         favIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +99,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
 
                 //TODO CLEAN LOGS
                 Log.d("FAVORITES: ", " clicked on fav icon");
-                Log.d("ID CLICKED: ", "" + p.getId());
+                Log.d("ID CLICKED: ", "" + v.getId());
 
                 addToFav(p.getId());
 

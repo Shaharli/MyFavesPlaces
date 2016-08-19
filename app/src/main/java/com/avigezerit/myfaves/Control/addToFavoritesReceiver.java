@@ -27,7 +27,6 @@ public class addToFavoritesReceiver extends BroadcastReceiver {
         Uri uri = dbContract.mPlacesTable.CONTENT_URI;
         ContentValues cv = new ContentValues();
 
-
         String[] projection = new String[]{dbc.COL_ISFAV_6};
         String[] whereArgs = new String[]{"" + id};
 

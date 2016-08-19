@@ -80,7 +80,6 @@ public class PlaceListFragment extends Fragment implements View.OnClickListener,
         IntentFilter filter = new IntentFilter(dbc.ACTION_FAVED);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
 
-
         return v;
     }
 

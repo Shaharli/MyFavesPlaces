@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="Kilometers"
+        android:dialogTitle="Measurement Units"
+        android:key="unit"
+        android:summary="Kilometers"
+        android:title="Measurement Units" />
+
+    <Preference
+        android:key="clear"
+        android:summary="Click here to clean your favorite places list"
+        android:title="Clear Faves List" />
+
+    <Preference
+        android:key="exit"
+        android:title="Save and Exit" />
+
+</PreferenceScreen>
