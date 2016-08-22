@@ -109,7 +109,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                 startActivity(gotoSettings);
                 break;
             case R.id.faves:
-                Intent gotoFaves = new Intent(SettingsActivity.this, favesListActivity.class);
+                Intent gotoFaves = new Intent(SettingsActivity.this, FavesListActivity.class);
                 startActivity(gotoFaves);
                 break;
         }

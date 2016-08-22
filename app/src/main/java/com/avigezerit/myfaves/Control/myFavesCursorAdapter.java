@@ -2,8 +2,11 @@ package com.avigezerit.myfaves.Control;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +17,6 @@ import android.widget.TextView;
 
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.Model.dbm;
-import com.avigezerit.myfaves.Place;
 import com.avigezerit.myfaves.R;
 import com.squareup.picasso.Picasso;
 
@@ -34,7 +36,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
 
     //saveMyLocation
     private double myLocationLati;
-    private double MyLocationLongi;
+    private double myLocationLongi;
 
     //
     static ImageView favIcon;
@@ -59,9 +61,9 @@ public class myFavesCursorAdapter extends CursorAdapter {
     public void bindView(View view, final Context context, final Cursor cursor) {
 
         //TO DONE: ref to xml
-        TextView flNameTV = (TextView) view.findViewById(R.id.flNameTV);
-        //TextView flAddressTV = (TextView) view.findViewById(R.id.flDistanceTV);
-        TextView flDistanceTV = (TextView) view.findViewById(R.id.placeAddressTV);
+        TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
+        TextView addressTV = (TextView) view.findViewById(R.id.addressTV);
+        TextView distanceTV = (TextView) view.findViewById(R.id.distanceTV);
         ImageView flPicIV = (ImageView) view.findViewById(R.id.flPicIV);
         favIcon = (ImageView) view.findViewById(R.id.favIV);
 
@@ -73,10 +75,16 @@ public class myFavesCursorAdapter extends CursorAdapter {
         mIsFav = cursor.getInt(cursor.getColumnIndex(dbc.COL_ISFAV_6));
 
         //extract lati & longi to double[]
-        double flLati = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LATITUDE_2));
-        double flLongi = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LONGITUDE_3));
+        double placeLati = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LATITUDE_2));
+        double placeLongi = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LONGITUDE_3));
 
-        changeFavOption(mIsFav);
+        if (mIsFav == 1) {
+            favIcon.setImageResource(R.drawable.ic_favorite_filled);
+        } else if (mIsFav == 0) {
+            favIcon.setImageResource(R.drawable.ic_favorite_border);
+        }
+
+        //changeFavOption(mIsFav);
 
         if (mImage != null) {
 
@@ -86,6 +94,9 @@ public class myFavesCursorAdapter extends CursorAdapter {
             flPicIV.setImageResource(R.drawable.photo_ph);
 
         //??defining a place
+
+
+        String mDistance = getDisfromMyLocationToPlace(placeLati, placeLongi);
 
         p.setId(mId);
         p.setFav(false);
@@ -98,30 +109,11 @@ public class myFavesCursorAdapter extends CursorAdapter {
             }
         });
 
-        //TODO get current location once!
-
-        getCurrentPositionToCalcDistance();
-
-        //define double arrays
-        Double[] favPositionCoords = new Double[]{flLati, flLongi};
-        Double[] currentPositionCoords = new Double[]{myLocationLati, MyLocationLongi};
-
-        //TO DONE: calculate distance
-        //String mDistance = getLocationHelper.getDisfromAtoB(currentPositionCoords, favPositionCoords);
-
         //set values
-        flNameTV.setText(mName);
-        flDistanceTV.setText(mAddress);
+        nameTV.setText(mName);
+        addressTV.setText(mAddress);
+        distanceTV.setText(mDistance);
 
-    }
-
-    public static void changeFavOption(int mIsFav) {
-
-        if (mIsFav == 1) {
-            favIcon.setImageResource(R.drawable.ic_favorite_filled);
-        } else if (mIsFav == 0) {
-            favIcon.setImageResource(R.drawable.ic_favorite_border);
-        }
     }
 
 
@@ -133,14 +125,25 @@ public class myFavesCursorAdapter extends CursorAdapter {
     }
 
 
-    private void getCurrentPositionToCalcDistance() {
+    private String getDisfromMyLocationToPlace(double placeLati, double placeLongi) {
 
-        //getLocationHelper currentPosition = new getLocationHelper();
-        //currentPosition.setContext(context);
-        //Double[] coords = currentPosition.getPositionOfMyLocation();
+        //get my current location from shared pref
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        double mLati = pref.getFloat("lt", 0f);
+        double mLongi = pref.getFloat("lg", 0f);
 
-        //myLocationLati = coords[0];
-        //MyLocationLongi = coords[1];
+        //define locations
+        Location myLocation = new Location("");
+        myLocation.setLatitude(mLati);
+        myLocation.setLongitude(mLongi);
+
+        Location placeLocation = new Location("");
+        placeLocation.setLatitude(placeLati);
+        placeLocation.setLongitude(placeLongi);
+
+        float distanceInMeters = myLocation.distanceTo(placeLocation);
+
+        return "" + distanceInMeters;
 
     }
 }

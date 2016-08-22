@@ -9,6 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.avigezerit.myfaves.Control.Place;
+import com.avigezerit.myfaves.Control.getLocationHelper;
+
 /* * * * * * * * * * * * *  ADD OR EDIT FAV ACTIVITY - ON LONG TAP * * * * * * * * * * * * */
 
 public class ManageFavActivity extends AppCompatActivity implements View.OnClickListener {
@@ -81,28 +84,17 @@ public class ManageFavActivity extends AppCompatActivity implements View.OnClick
 
     private void getMyPosition() {
 
-        /*
         getLocationHelper tempPosition = new getLocationHelper();
-        tempPosition.setContext(ManageFavActivity.this);
+        tempPosition.setContext(this, ManageFavActivity.this);
         tempPosition.getPositionOfMyLocation();
 
-        tempFL.setLati(tempPosition.getLati());
-        tempFL.setLongi(tempPosition.getLongi());
+        //tempFL.setLati(tempPosition.getLati());
+        //tempFL.setLongi(tempPosition.getLongi());
         gotLatiLangi = true;
 
-        tempPosition.setContext(context);
-        String addressBasedOnPosition = tempPosition.getAddressFromLL(tempPosition);
 
-        //bye bye btn, hello link if problem
-        useLocationBtn.setVisibility(View.GONE);
-        mPositionTV.setText(" " + addressBasedOnPosition);
-        Button getLocationAgain = (Button) findViewById(R.id.getLocationAgainBTN);
-        getLocationAgain.setVisibility(View.VISIBLE);
-        getLocationAgain.setOnClickListener(this);
 
-        //TODO get Address autoComplete\
 
-        */
 
     }
 

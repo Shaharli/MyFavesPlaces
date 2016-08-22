@@ -1,32 +1,26 @@
 package com.avigezerit.myfaves.View;
 
-import android.Manifest;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.avigezerit.myfaves.Control.LoadMapIF;
-import com.avigezerit.myfaves.Control.checkPermissionsHelper;
-import com.avigezerit.myfaves.Control.mService;
+import com.avigezerit.myfaves.Control.StartSearchingService;
+import com.avigezerit.myfaves.Control.mReceivers.PowerConnectionReceiver;
 import com.avigezerit.myfaves.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,7 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.URLEncoder;
 
-public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener, android.location.LocationListener {
+public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     private static final String TAG = SearchActivity.class.getSimpleName();
 
@@ -51,13 +45,14 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     String searchTermFromET;
     Button startSearchBtn;
 
-    //location
+    //cb near by
+    CheckBox cb;
+    SeekBar sb;
+    private boolean searchNearBy = false;
+    int rs = 500;
 
-    checkPermissionsHelper helper;
-    private static final int REQUEST_GPS_PERMISSION = 101;
-    private LocationManager locationManager;
-    private String provider;
-    Location mLocation;
+    //charging alert
+    PowerConnectionReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +79,20 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         startSearchBtn = (Button) findViewById(R.id.activateSearchBtn);
         startSearchBtn.setOnClickListener(this);
 
+        //init cb
+        cb = (CheckBox) findViewById(R.id.nearByCB);
 
-        //requestPermission();
+        //int sb
+        sb = (SeekBar) findViewById(R.id.radiusSB);
+        sb.setOnSeekBarChangeListener(this);
+        sb.setMax(20000);
+        sb.setKeyProgressIncrement(100);
+        sb.setProgress(500);
 
-        //requestLocationUpdates();
+        //test to get location
+        Button getLoactionBtn = (Button) findViewById(R.id.getCurrentLocationBtn);
+        getLoactionBtn.setOnClickListener(this);
+
 
     }
 
@@ -166,7 +171,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
                 startActivity(gotoSettings);
                 break;
             case R.id.faves:
-                Intent gotoFaves = new Intent(SearchActivity.this, favesListActivity.class);
+                Intent gotoFaves = new Intent(SearchActivity.this, FavesListActivity.class);
                 startActivity(gotoFaves);
                 break;
         }
@@ -176,111 +181,88 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
     @Override
     public void onClick(View v) {
-        //get text from edit text
-        searchTermFromET = searchTermET.getText().toString();
 
-        //validate search term: short(1 char) or empty
-        if (searchTermFromET.length() > 2 || !searchTermFromET.equals("")) {
+        switch (v.getId()) {
 
-            //encode url
-            String searchTermEncoded = URLEncoder.encode(searchTermFromET);
+            case R.id.activateSearchBtn:
 
-            //send query to service
-            Intent intent = new Intent(this, mService.class);
-            intent.putExtra("term", searchTermEncoded);
-            startService(intent);
-        } else Toast.makeText(this, "Search with at least 2 letters", Toast.LENGTH_SHORT);
-    }
+                Log.d(TAG, "clicked search");
+
+                //get text from edit text
+                searchTermFromET = searchTermET.getText().toString();
+
+                //validate search term: short(1 char) or empty
+                if (searchTermFromET.length() < 2 || searchTermFromET.equals("")) {
+
+                    Toast.makeText(this, "Search with at least 2 letters", Toast.LENGTH_SHORT).show();
+                }
+
+                //encode url
+                String searchTermEncoded = URLEncoder.encode(searchTermFromET);
 
 
-    private void requestPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_GPS_PERMISSION);
+                Intent intent = new Intent(this, StartSearchingService.class);
+
+                //send query params to service
+                intent.putExtra("term", searchTermEncoded);
+
+                //get cb status
+                if (cb.isChecked()) {
+                    intent.putExtra("cb", true);
+                } else {
+                    intent.putExtra("cb", false);
+                }
+
+                //go to search
+                startService(intent);
+
+                break;
+
+            case R.id.getCurrentLocationBtn:
+
+                //setting location to Place
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putFloat("lt", 32.0861945f);
+                editor.putFloat("lg", 34.8127379f);
+                editor.apply();
+                editor.commit();
+
+                break;
+
         }
-    }
-
-    private void requestLocationUpdates() {
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-            locationManager = (LocationManager) getSystemService(this.LOCATION_SERVICE);
-
-            //get the best location-provider that matches a certain criteria
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            criteria.setPowerRequirement(Criteria.POWER_HIGH);
-
-            //set to provider
-            provider = locationManager.getBestProvider(criteria, true);
-
-            Log.d(TAG, "Provider: " + provider);
-
-            locationManager.requestLocationUpdates(provider, 40000, 0, this);
-
-        }
 
     }
 
-    private void removeLocationUpdates() {
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_GPS_PERMISSION);
-        }
-        //locationManager.removeUpdates(this);
-        Log.d(TAG, "Removed updates");
-
-    }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //removeLocationUpdates();
+
+        // TODO crashing??
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+        }
+        //
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+    rs = progress;
+    }
 
-        mLocation = location;
-        Log.d(TAG, "lati: " + location.getLatitude() + " longi: " + location.getLongitude());
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
 
-        //setting location to Place
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        Toast.makeText(this,"Radius set:"+rs, Toast.LENGTH_SHORT).show();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("lati", String.valueOf(location.getLatitude()));
-        editor.putString("longi", String.valueOf(location.getLongitude()));
+        editor.putInt("rs", rs);
         editor.apply();
-        editor.commit();
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        if (requestCode == REQUEST_GPS_PERMISSION) {
-
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Granted! ");
-                requestLocationUpdates();
-
-            } else {
-                //helper.alarmUser();
-            }
-        }
     }
 }
 

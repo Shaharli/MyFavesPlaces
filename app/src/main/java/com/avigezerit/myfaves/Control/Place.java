@@ -1,4 +1,4 @@
-package com.avigezerit.myfaves;
+package com.avigezerit.myfaves.Control;
 
  /* * * * * * * * * * * * * FAV LOCATION POJO * * * * * * * * * * * * */
 

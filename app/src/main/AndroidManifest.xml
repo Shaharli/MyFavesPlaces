@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <resource-overlay android:targetPackage="com.avigezerit.myfaves" />
 
     <application
         android:allowBackup="true"
@@ -12,14 +15,23 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.AppBarOverlay">
-        <activity android:name=".View.favesListActivity"/>
-        <activity android:name=".ManageFavActivity" />
+        <activity android:name=".View.FavesListActivity" />
+        <activity android:name=".ManageFavActivity"></activity>
 
-        <service android:name=".Control.mService">
+        <service android:name=".Control.StartSearchingService">
             <intent-filter>
                 <action android:name="com.avigezerit.myfaves.action.SEARCH" />
             </intent-filter>
         </service>
+
+        <receiver android:name=".Control.mReceivers.ManageFavoritesReceiver">
+            <intent-filter>
+                <action android:name="com.avigezerit.myfaves.action.FAVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.avigezerit.myfaves.action.UNFAVED" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name=".Model.dbProvider"
@@ -27,18 +39,21 @@
             android:enabled="true"
             android:exported="true" />
 
+        <activity android:name=".View.SearchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".View.SettingsActivity"
+            android:theme="@style/Theme.AppCompat.Dialog" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB2eNueotW9eTU2scgoiGd-KjpvRfWmKHM" />
 
-        <activity android:name=".View.SearchActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".View.SettingsActivity" android:theme="@style/Theme.AppCompat.Dialog"/>
     </application>
 
 </manifest>

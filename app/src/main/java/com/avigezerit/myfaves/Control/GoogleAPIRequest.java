@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class GoogleAPIRequest {
     private final static String SEARCH_PLACE_CURRENT_LOCATION = "location=";
     private final static String SEARCH_PLACE_RADIUS = "radius=";
 
-    public static String getPhotoUrl(String photo_ref){
+    public static String getPhotoUrl(String photo_ref) {
 
         String photoUrl = SEARCH_PLACE_PREFIX
                 + SEARCH_PHOTO_TYPE
@@ -39,7 +40,7 @@ public class GoogleAPIRequest {
     }
 
     @NonNull
-    public static String searchPlace(String searchTerm, Context context) {
+    public static String searchPlace(String searchTerm, boolean nearBy, Context context) {
 
 
         //TODO Add near me location??
@@ -51,24 +52,25 @@ public class GoogleAPIRequest {
                 + "&" + SEARCH_PLACE_SENSOR
                 + "&" + SEARCH_PLACE_QUERY + searchTerm;
 
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        String mLati = pref.getString("location_lati", "");
-        String mLongi = pref.getString("location_longi", "");
 
-        String radius = "20000";
+        if (nearBy) {
 
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+            double mLati = pref.getFloat("lt", 0f);
+            double mLongi = pref.getFloat("lg", 0f);
+            int radius = pref.getInt("rs", 500);
 
-        /*
-                + SEARCH_PLACE_CURRENT_LOCATION + mLati + "," + mLongi
-                + SEARCH_PLACE_RADIUS + radius
-         */
+            //build query
+            query +=  "&" + SEARCH_PLACE_CURRENT_LOCATION + mLati + "," + mLongi
+                    + "&" +  SEARCH_PLACE_RADIUS + radius;
+        }
 
+        Log.d("", query);
 
         return connectAndDownload(query);
-
     }
 
-    public static String connectAndDownload(String query){
+    public static String connectAndDownload(String query) {
 
         BufferedReader input = null;
         HttpURLConnection connection = null;

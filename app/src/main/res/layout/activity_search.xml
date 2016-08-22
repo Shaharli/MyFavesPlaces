@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_marginTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="com.avigezerit.myfaves.View.SearchActivity">
 
     <EditText
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:imeOptions="actionSearch"
-        android:singleLine="true"/>
+        android:singleLine="true" />
 
     <Button
         android:id="@+id/activateSearchBtn"
@@ -23,8 +23,38 @@
         android:text="@string/search" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/nearByCB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Search Only Near Me" />
+
+        <SeekBar
+            android:id="@+id/radiusSB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/getCurrentLocationBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="get Current Location" />
+
+    <LinearLayout
+        android:id="@+id/containerSearchLL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/containerSearchLL"/>
+        android:orientation="vertical">
+
+
+    </LinearLayout>
 </LinearLayout>

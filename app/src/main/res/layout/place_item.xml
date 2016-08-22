@@ -27,23 +27,23 @@
 
 
         <TextView
-            android:id="@+id/flNameTV"
+            android:id="@+id/nameTV"
             style="@style/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Title" />
 
         <TextView
-            android:id="@+id/distanceTV"
+            android:id="@+id/addressTV"
             style="@style/smallText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="10sp"
-            android:text="distance" />
+            android:text="address" />
 
         <TextView
-            android:id="@+id/placeAddressTV"
+            android:id="@+id/distanceTV"
             style="@style/smallText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,10 +58,10 @@
         android:id="@+id/favIV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_favorite_border"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_favorite_border" />
 
 
 </RelativeLayout>

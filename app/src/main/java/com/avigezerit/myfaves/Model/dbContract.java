@@ -33,6 +33,11 @@ public class dbContract {
         //add to fave receiver action
         public static final String ACTION_FAVED = "com.avigezerit.myfaves.FAVED";
 
+        //remove from fave receiver action
+        public static final String ACTION_UNFAVED = "com.avigezerit.myfaves.UNFAVED";
+
+
+
         //loader request
 
 

@@ -20,18 +20,17 @@ public class JSONParserHelper {
 
     public static final String TAG = JSONParserHelper.class.getSimpleName();
 
-    public void parseJSON(String searchResultsToParse, Context cx) {
+    public void parseJSON(String searchResultsToParse, boolean nearBy, Context cx) {
 
         Log.d(TAG, "JSON Parser activated");
         Log.d(TAG, searchResultsToParse);
-
 
         //init cv and define uri
         Uri uri = dbContract.mPlacesTable.CONTENT_URI;
 
         //delete all current results beside favs
-        String[] whereArgs = new String[]{""+0};
-        cx.getContentResolver().delete(uri, dbc.COL_ISFAV_6+"=?", whereArgs);
+        String[] whereArgs = new String[]{"" + 0};
+        cx.getContentResolver().delete(uri, dbc.COL_ISFAV_6 + "=?", whereArgs);
 
         try {
 
@@ -46,6 +45,8 @@ public class JSONParserHelper {
             //check if result ok
             String resultsStatus = resultsMainObject.getString("status");
             if (!resultsStatus.equals("OK")) {
+
+                Log.d(TAG, "no results");
 
                 //Log.d(TAG, "Error with results");
 
@@ -76,7 +77,8 @@ public class JSONParserHelper {
                     String photo_ref = photoObject.getString("photo_reference");
                     mImage = GoogleAPIRequest.getPhotoUrl(photo_ref);
 
-                } catch (JSONException e) {}
+                } catch (JSONException e) {
+                }
 
                 //print to log
                 Log.d(TAG, "This is a place: " + mName + " " + mAddress + " " + mLati + " " + mLongi);
@@ -104,12 +106,6 @@ public class JSONParserHelper {
         {
             Log.d(TAG, e.getMessage());
         }
-
-    }
-
-
-    private void addImage() {
-
 
     }
 }
