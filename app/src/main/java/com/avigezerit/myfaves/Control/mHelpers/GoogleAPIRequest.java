@@ -1,4 +1,4 @@
-package com.avigezerit.myfaves.Control;
+package com.avigezerit.myfaves.Control.mHelpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,12 +13,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/* * * * * * * * * * * * * GOOGLE PLACES API REQUEST * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * *  API REQUEST - USED BY SERVICE  * * * * * * * * * * * * * * * * * */
 
 public class GoogleAPIRequest {
 
+    //QUERY CONSTANTS
     private final static String SEARCH_API_KEY = "key=AIzaSyB2eNueotW9eTU2scgoiGd-KjpvRfWmKHM";
-
     private final static String SEARCH_PLACE_PREFIX = "https://maps.googleapis.com/maps/api/place/";
     private final static String SEARCH_PLACE_TYPE = "textsearch/json?";
     private final static String SEARCH_PHOTO_TYPE = "photo?maxwidth=400";
@@ -42,9 +42,6 @@ public class GoogleAPIRequest {
     @NonNull
     public static String searchPlace(String searchTerm, boolean nearBy, Context context) {
 
-
-        //TODO Add near me location??
-
         //build query
         String query = SEARCH_PLACE_PREFIX
                 + SEARCH_PLACE_TYPE
@@ -58,7 +55,7 @@ public class GoogleAPIRequest {
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
             double mLati = pref.getFloat("lt", 0f);
             double mLongi = pref.getFloat("lg", 0f);
-            int radius = pref.getInt("rs", 500);
+            int radius = pref.getInt("rs", 1);
 
             //build query
             query +=  "&" + SEARCH_PLACE_CURRENT_LOCATION + mLati + "," + mLongi

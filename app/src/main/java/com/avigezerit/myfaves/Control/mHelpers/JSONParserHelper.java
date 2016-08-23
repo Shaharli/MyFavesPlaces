@@ -1,9 +1,10 @@
-package com.avigezerit.myfaves.Control;
+package com.avigezerit.myfaves.Control.mHelpers;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.avigezerit.myfaves.Model.dbContract;
 
@@ -45,12 +46,7 @@ public class JSONParserHelper {
             //check if result ok
             String resultsStatus = resultsMainObject.getString("status");
             if (!resultsStatus.equals("OK")) {
-
-                Log.d(TAG, "no results");
-
-                //Log.d(TAG, "Error with results");
-
-                //TODO broadcast result not ok;
+                Toast.makeText(cx, "No Results found!", Toast.LENGTH_SHORT).show();
             }
 
             //extracting every result data using JSON array

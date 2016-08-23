@@ -1,4 +1,4 @@
-package com.avigezerit.myfaves.Control;
+package com.avigezerit.myfaves.Control.mHelpers;
 
 import android.Manifest;
 import android.app.Activity;
@@ -12,28 +12,29 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-/**
- * Created by Shaharli on 20/08/2016.
- */
-public class getLocationHelper extends Activity implements android.location.LocationListener {
+/* * * * * * * * * * * * * * * * * * * *  LOCATION HELPER  * * * * * * * * * * * * * * * * * * * */
+
+
+public class getLocationHelper extends FragmentActivity implements android.location.LocationListener {
 
 
     private static final String TAG = getLocationHelper.class.getSimpleName();
-//permission
 
+    //permission req code
     private static final int REQUEST_PERMISSION = 101;
+
     //get location
     private LocationManager locationManager;
     private String provider;
+
+    //context holder
     Context context;
     Activity activity;
-    private double mLati;
-    private double mLongi;
 
     public getLocationHelper() {
-
     }
 
     public void setContext(Context context, Activity activity) {
@@ -41,11 +42,8 @@ public class getLocationHelper extends Activity implements android.location.Loca
         this.activity = activity;
     }
 
-    //get location
+    //init manager & get current location
     public void getCurrentLocation() {
-
-        Log.d(TAG, "Getting Location");
-
 
         //get an instance of the location service
         locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
@@ -68,7 +66,7 @@ public class getLocationHelper extends Activity implements android.location.Loca
 
     }
 
-    //check for permission
+    //check and request for location permission
     public void checkPermission() {
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -82,9 +80,10 @@ public class getLocationHelper extends Activity implements android.location.Loca
         }
     }
 
+    //saving location for app-level use
     private void writeToSharedPref(double mLt, double mLng) {
 
-        //setting location to Place
+        //setting location to PlaceClass
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putFloat("lt", (float) mLt);

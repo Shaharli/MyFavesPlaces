@@ -1,12 +1,11 @@
-package com.avigezerit.myfaves.Control;
+package com.avigezerit.myfaves.Control.mHelpers;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-/**
- * Created by Shaharli on 18/08/2016.
- */
+/* * * * * * * * * * * * * * * * *  SEARCHING ACTIVATED - SERVICE  * * * * * * * * * * * * * * * * * */
+
 public class StartSearchingService extends IntentService {
 
     public StartSearchingService() {

@@ -9,11 +9,10 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.avigezerit.myfaves.Model.dbContract;
-import com.avigezerit.myfaves.Model.dbm;
+import com.avigezerit.myfaves.Model.dbManager;
 
-/**
- * Created by Shaharli on 18/08/2016.
- */
+/* * * * * * * * * * * * * * * * *  FAVORITES MANAGER - RECEIVER  * * * * * * * * * * * * * * * * * */
+
 public class ManageFavoritesReceiver extends BroadcastReceiver {
 
     private static final String TAG = ManageFavoritesReceiver.class.getSimpleName();
@@ -32,30 +31,19 @@ public class ManageFavoritesReceiver extends BroadcastReceiver {
         int id;
 
         //get the id of the place that will be added to fave
-        id = intent.getIntExtra("_id", -1);
-
-        if (id != -1) {
-            // CLICKED ICON
-            String[] whereArgs = new String[]{"" + id};
-            c = context.getContentResolver().query(uri, null, dbc.COL_ID_0 + "=?", whereArgs, null);
-            c.moveToNext();
-
-        } else {
-            // CLICKED CONTEXT MENU
-            c = context.getContentResolver().query(uri, null, null, null, null);
-            id = c.getInt(c.getColumnIndex(dbc.COL_ID_0));
-        }
+        c = context.getContentResolver().query(uri, null, null, null, null);
+        id = c.getInt(c.getColumnIndex(dbc.COL_ID_0));
 
         String[] whereArgs = new String[]{"" + id};
 
         if (intent.getAction() == dbc.ACTION_FAVED) {
 
-            cv.put(dbm.COL_ISFAV_6, 1);
+            cv.put(dbManager.COL_ISFAV_6, 1);
 
             context.getContentResolver().update(uri, cv, dbc.COL_ID_0 + "=?", whereArgs);
 
 
-        } else if (intent.getAction() == dbc.ACTION_FAVED) {
+        } else if (intent.getAction() == dbc.ACTION_UNFAVED) {
 
             context.getContentResolver().delete(uri, dbc.COL_ID_0 + "=?", whereArgs);
 
@@ -63,19 +51,6 @@ public class ManageFavoritesReceiver extends BroadcastReceiver {
 
         context.getContentResolver().notifyChange(uri, null);
         c.close();
-
-        /*check if is currently fav
-        int isFav = c.getInt(c.getColumnIndex(dbc.COL_ISFAV_6));
-
-        if (isFav == 1) {
-
-            //myFavesCursorAdapter.changeFavOption(0);
-        } else {
-
-            //myFavesCursorAdapter.changeFavOption(1);
-        }
-        */
-
 
     }
 }

@@ -1,8 +1,8 @@
 package com.avigezerit.myfaves.Control;
 
- /* * * * * * * * * * * * * FAV LOCATION POJO * * * * * * * * * * * * */
+ /* * * * * * * * * * * * * LOCATION POJO * * * * * * * * * * * * */
 
-public class Place {
+public class PlaceClass {
 
     private int _id;
     private String mName;
@@ -12,10 +12,10 @@ public class Place {
     private int mImage;
     private boolean isFav;
 
-    public Place() {
+    public PlaceClass() {
     }
 
-    public Place(String mName, double mLati, double mLongi) {
+    public PlaceClass(String mName, double mLati, double mLongi) {
         this.mName = mName;
         this.mLati = mLati;
         this.mLongi = mLongi;

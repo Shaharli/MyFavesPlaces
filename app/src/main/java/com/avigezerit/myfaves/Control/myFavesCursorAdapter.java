@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avigezerit.myfaves.Model.dbContract;
-import com.avigezerit.myfaves.Model.dbm;
+import com.avigezerit.myfaves.Model.dbManager;
 import com.avigezerit.myfaves.R;
 import com.squareup.picasso.Picasso;
 
@@ -30,7 +30,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
     View view;
 
     //instance of place obj
-    Place p = new Place();
+    PlaceClass p = new PlaceClass();
 
     //db
     private dbContract.mPlacesTable dbc;
@@ -72,12 +72,12 @@ public class myFavesCursorAdapter extends CursorAdapter {
         int mId = cursor.getInt(cursor.getColumnIndex(dbc.COL_ID_0));
         String mName = cursor.getString(cursor.getColumnIndex(dbc.COL_NAME_1));
         String mAddress = cursor.getString(cursor.getColumnIndex(dbc.COL_ADDRESS_4));
-        String mImage = cursor.getString(cursor.getColumnIndex(dbm.COL_IMAGE_5));
+        String mImage = cursor.getString(cursor.getColumnIndex(dbManager.COL_IMAGE_5));
         int mIsFav = cursor.getInt(cursor.getColumnIndex(dbc.COL_ISFAV_6));
 
         //extract lati & longi to double[] to get dist
-        double placeLati = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LATITUDE_2));
-        double placeLongi = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LONGITUDE_3));
+        double placeLati = cursor.getDouble(cursor.getColumnIndex(dbManager.COL_LATITUDE_2));
+        double placeLongi = cursor.getDouble(cursor.getColumnIndex(dbManager.COL_LONGITUDE_3));
         String mDistance = getDisfromMyLocationToPlace(placeLati, placeLongi);
 
         //fav handler
@@ -120,18 +120,20 @@ public class myFavesCursorAdapter extends CursorAdapter {
         placeLocation.setLatitude(placeLati);
         placeLocation.setLongitude(placeLongi);
 
-        float disAsFloat = myLocation.distanceTo(placeLocation)/1000;
+        float disAsFloat = myLocation.distanceTo(placeLocation) / 1000;
 
         int disInKM = (int) disAsFloat;
 
         String dist = "" + disInKM + "KM away";
 
-        if (disInKM>100){
+        if (disInKM > 100) {
             dist = "Really Far away!";
         }
-        if (disInKM<1){
+        if (disInKM < 1) {
             dist = "Right around the corner";
         }
+
+        //TODO miles from km
 
         return dist;
 

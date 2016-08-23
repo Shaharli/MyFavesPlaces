@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-/**
- * Created by Shaharli on 20/08/2016.
- */
+/* * * * * * * * * * * * * * * * *  POWER CONNECTION - RECEIVER  * * * * * * * * * * * * * * * * * */
+
+
 public class PowerConnectionReceiver extends BroadcastReceiver {
 
     @Override

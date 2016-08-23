@@ -1,10 +1,10 @@
-package com.avigezerit.myfaves.Control;
+package com.avigezerit.myfaves.Control.mHelpers;
 
 import com.google.android.gms.maps.model.LatLng;
 
-/**
- * Created by Shaharli on 18/08/2016.
- */
+/* * * * * * * * * * * * * MAP FRAGMENT LOADING - INTERFACE * * * * * * * * * * * * */
+
+
 public interface LoadMapIF {
 
     public void loadMapOfSelectedPlace(String placeName, LatLng placeCoordinates);

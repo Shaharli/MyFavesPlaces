@@ -7,9 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
-/**
- * Created by Shaharli on 20/08/2016.
- */
+/* * * * * * * * * * * * * * * * *  INTERNET CONNECTION - RECEIVER  * * * * * * * * * * * * * * * * * */
+
 public class InternetConnectionReceiver extends BroadcastReceiver {
 
     @Override
@@ -22,9 +21,7 @@ public class InternetConnectionReceiver extends BroadcastReceiver {
 
         } else {
             Toast.makeText(context, "Connection faild", Toast.LENGTH_LONG).show();
-
         }
-
     }
 
     public boolean isNetworkAvailable(Context context) {

@@ -3,6 +3,7 @@ package com.avigezerit.myfaves.View;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,9 +22,10 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.avigezerit.myfaves.Control.LoadMapIF;
-import com.avigezerit.myfaves.Control.StartSearchingService;
-import com.avigezerit.myfaves.Control.getLocationHelper;
+import com.avigezerit.myfaves.Control.mHelpers.LoadMapIF;
+import com.avigezerit.myfaves.Control.mHelpers.StartSearchingService;
+import com.avigezerit.myfaves.Control.mHelpers.getLocationHelper;
+import com.avigezerit.myfaves.Control.mReceivers.InternetConnectionReceiver;
 import com.avigezerit.myfaves.Control.mReceivers.PowerConnectionReceiver;
 import com.avigezerit.myfaves.R;
 import com.google.android.gms.maps.CameraUpdate;
@@ -36,11 +38,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.URLEncoder;
 
+/* * * * * * * * * * * * * * * * *  SEARCH PLACES ACTIVITY - HOSTING FRAGMENTS  * * * * * * * * * * * * * * * * * */
+
 public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener, CheckBox.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
 
     private static final String TAG = SearchActivity.class.getSimpleName();
 
-    //fragments
+    //frags obj related
     FragmentManager manager;
     FragmentTransaction transaction;
 
@@ -57,7 +61,8 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     int rs = 1;
 
     //charging alert
-    PowerConnectionReceiver receiver;
+    PowerConnectionReceiver powerReceiver;
+    InternetConnectionReceiver internetReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         //define related frags
         PlaceListFragment list = new PlaceListFragment();
 
+        //init frags obj
         manager = getFragmentManager();
         transaction = manager.beginTransaction();
 
@@ -80,35 +86,57 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         }
         transaction.commit();
 
+        //bind to ET
         searchTermET = (EditText) findViewById(R.id.searchPlaceET);
-        startSearchBtn = (Button) findViewById(R.id.activateSearchBtn);
-        startSearchBtn.setOnClickListener(this);
         searchTIL = (TextInputLayout) findViewById(R.id.searchTIL);
 
-        //init cb
+        //bind to btn
+        startSearchBtn = (Button) findViewById(R.id.activateSearchBtn);
+        startSearchBtn.setOnClickListener(this);
+
+        //bind cb
         cb = (CheckBox) findViewById(R.id.nearByCB);
         cb.setOnCheckedChangeListener(this);
+
+        //bind to sb
+        sb = (SeekBar) findViewById(R.id.radiusSB);
+        sb.setOnSeekBarChangeListener(this);
+
+        //set sb params and initially hide layout
+        initRadiusSB();
+        rsbLL = (LinearLayout) findViewById(R.id.rsbLL);
+        rsbLL.setVisibility(View.GONE);
 
         //get location
         getLocationHelper helper = new getLocationHelper();
         helper.setContext(this, this);
         helper.getCurrentLocation();
 
-        initRadiusSB();
+        //register powerReceiver
+        initReceivers();
+    }
 
-        rsbLL = (LinearLayout) findViewById(R.id.rsbLL);
-        rsbLL.setVisibility(View.GONE);
+    //// INITIALIZING METHODS ////
+
+    private void initReceivers() {
+
+        //power connection
+        powerReceiver = new PowerConnectionReceiver();
+        IntentFilter powerConnectedIF = new IntentFilter("com.avigezerit.myfaves.action.ACTION_POWER_CONNECTED");
+        IntentFilter powerDisconnectedIF = new IntentFilter("com.avigezerit.myfaves.action.ACTION_POWER_DISCONNECTED");
+        registerReceiver(powerReceiver, powerConnectedIF);
+        registerReceiver(powerReceiver, powerDisconnectedIF);
+
+        //internet connection
+        internetReceiver = new InternetConnectionReceiver();
+        IntentFilter internetDisconnectedIF = new IntentFilter("com.avigezerit.myfaves.action.ACTION_POWER_CONNECTED");
+        registerReceiver(internetReceiver, internetDisconnectedIF);
 
     }
 
     private void initRadiusSB() {
-
-        //int sb
-        sb = (SeekBar) findViewById(R.id.radiusSB);
-        sb.setOnSeekBarChangeListener(this);
         sb.setMax(50);
         sb.setProgress(10);
-
     }
 
     public boolean isLanscapeMode() {
@@ -130,6 +158,8 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
         return isLanscapeMode;
     }
+
+    //// MAP FRAG INTERFACE METHOD ////
 
     @Override
     public void loadMapOfSelectedPlace(final String placeName, final LatLng placeCoordinates) {
@@ -161,15 +191,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         }
     }
 
-    @Override
-    public void onBackPressed() {
-
-        manager.popBackStack();
-
-        if (manager.getBackStackEntryCount() == 0) {
-            super.onBackPressed();
-        }
-    }
+    //// OPTIONS MENU ////
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,10 +216,38 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         return true;
     }
 
+    //// ACTIVITY EVENTS ////
+
+    @Override
+    public void onBackPressed() {
+
+        manager.popBackStack();
+
+        if (manager.getBackStackEntryCount() == 0) {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+
+        //unregister receiver to avoid harassment!
+        if (powerReceiver != null) {
+            unregisterReceiver(powerReceiver);
+        }
+        if (internetReceiver != null) {
+            unregisterReceiver(internetReceiver);
+        }
+
+        super.onPause();
+
+
+    }
+
+    //// UI EVENTS ////
+
     @Override
     public void onClick(View v) {
-
-        Log.d(TAG, "clicked search");
 
         //get text from edit text
         searchTermFromET = searchTermET.getText().toString();
@@ -233,23 +283,11 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
             Toast.makeText(this, "Fetching Results...", Toast.LENGTH_SHORT).show();
 
-        } else{
+        } else {
             searchTIL.setError("Requires at least 2 characters");
         }
 
 
-    }
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // TODO crashing??
-        if (receiver != null) {
-            unregisterReceiver(receiver);
-        }
-        //
     }
 
     @Override
@@ -281,6 +319,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         }
 
     }
+
 }
 
 

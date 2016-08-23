@@ -4,7 +4,7 @@ import android.content.Context;
 
 /* * * * * * * * * * * * * PLACES DB MANAGER COMMANDS  * * * * * * * * * * * * */
 
-public class dbm {
+public class dbManager {
 
     //bind to database helper
     private static com.avigezerit.myfaves.Model.dbHelper dbHelper;
@@ -28,7 +28,7 @@ public class dbm {
 
     ///////////////////////////////////////// CREATION /////////////////////////////////////////////
 
-    public dbm(Context c) {
+    public dbManager(Context c) {
         dbHelper = new dbHelper(c);
         this.context = c;
     }
@@ -44,7 +44,7 @@ public class dbm {
 
     }
 
-    public Cursor getFLDataAsCursorByID(Place FL) {
+    public Cursor getFLDataAsCursorByID(PlaceClass FL) {
 
         String[] whereArgs = new String[]{"" + FL.getId()};
 
@@ -52,7 +52,7 @@ public class dbm {
         return c;
     }
 
-    public static void addNewFL(Place FL) {
+    public static void addNewFL(PlaceClass FL) {
 
         ContentValues cv = new ContentValues();
 
@@ -72,7 +72,7 @@ public class dbm {
 
     }
 
-    public void updateFL(Place FL) {
+    public void updateFL(PlaceClass FL) {
 
         ContentValues cv = new ContentValues();
 
@@ -88,7 +88,7 @@ public class dbm {
 
     }
 
-    public void deleteFLByID(Place FL) {
+    public void deleteFLByID(PlaceClass FL) {
 
         String[] whereArgs = new String[]{"" + FL.getId()};
 
@@ -96,7 +96,7 @@ public class dbm {
 
     }
 
-    public static String getAddressByLL(Place FL, Context c) {
+    public static String getAddressByLL(PlaceClass FL, Context c) {
 
         List<Address> addresses;
         String address = "default", city = "default", state = "default", country = "default";

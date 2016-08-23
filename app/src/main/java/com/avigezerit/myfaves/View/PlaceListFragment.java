@@ -22,7 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.avigezerit.myfaves.Control.LoadMapIF;
+import com.avigezerit.myfaves.Control.mHelpers.LoadMapIF;
 import com.avigezerit.myfaves.Control.mReceivers.ManageFavoritesReceiver;
 import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
@@ -70,7 +70,7 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(SEARCH_RESULT_CURSOR_ID, null, this);
 
-        //receiver for adding to favorites
+        //powerReceiver for adding to favorites
         ManageFavoritesReceiver receiver = new ManageFavoritesReceiver();
         IntentFilter filter = new IntentFilter(dbc.ACTION_FAVED);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
