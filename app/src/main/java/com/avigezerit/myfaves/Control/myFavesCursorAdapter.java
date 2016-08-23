@@ -1,13 +1,11 @@
 package com.avigezerit.myfaves.Control;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,27 +18,30 @@ import com.avigezerit.myfaves.Model.dbm;
 import com.avigezerit.myfaves.R;
 import com.squareup.picasso.Picasso;
 
-/* * * * * * * * * * * * * FAV LIST CURSOR ADAPTER - MAIN * * * * * * * * * * * * */
+/* * * * * * * * * * * * * PLACES LIST CURSOR ADAPTER  * * * * * * * * * * * * * */
 
 public class myFavesCursorAdapter extends CursorAdapter {
 
+    //Log
     private static final String TAG = myFavesCursorAdapter.class.getSimpleName();
 
+    //context holder
     Context context;
     View view;
 
+    //instance of place obj
     Place p = new Place();
 
+    //db
     private dbContract.mPlacesTable dbc;
     Uri uri = dbContract.mPlacesTable.CONTENT_URI;
 
-    //saveMyLocation
-    private double myLocationLati;
-    private double myLocationLongi;
-
-    //
-    static ImageView favIcon;
-    int mIsFav;
+    //xml ref re-use
+    TextView nameTV;
+    TextView addressTV;
+    TextView distanceTV;
+    ImageView picIV;
+    ImageView favIcon;
 
 
     public myFavesCursorAdapter(Context context, Cursor c) {
@@ -60,70 +61,48 @@ public class myFavesCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
 
-        //TO DONE: ref to xml
-        TextView nameTV = (TextView) view.findViewById(R.id.nameTV);
-        TextView addressTV = (TextView) view.findViewById(R.id.addressTV);
-        TextView distanceTV = (TextView) view.findViewById(R.id.distanceTV);
-        ImageView flPicIV = (ImageView) view.findViewById(R.id.flPicIV);
+        //ref to xml
+        nameTV = (TextView) view.findViewById(R.id.nameTV);
+        addressTV = (TextView) view.findViewById(R.id.addressTV);
+        distanceTV = (TextView) view.findViewById(R.id.distanceTV);
+        picIV = (ImageView) view.findViewById(R.id.flPicIV);
         favIcon = (ImageView) view.findViewById(R.id.favIV);
 
-        //TO DONE: binding data from cursor to view
+        //binding data from cursor to view
+        int mId = cursor.getInt(cursor.getColumnIndex(dbc.COL_ID_0));
         String mName = cursor.getString(cursor.getColumnIndex(dbc.COL_NAME_1));
         String mAddress = cursor.getString(cursor.getColumnIndex(dbc.COL_ADDRESS_4));
-        int mId = cursor.getInt(cursor.getColumnIndex(dbc.COL_ID_0));
         String mImage = cursor.getString(cursor.getColumnIndex(dbm.COL_IMAGE_5));
-        mIsFav = cursor.getInt(cursor.getColumnIndex(dbc.COL_ISFAV_6));
+        int mIsFav = cursor.getInt(cursor.getColumnIndex(dbc.COL_ISFAV_6));
 
-        //extract lati & longi to double[]
+        //extract lati & longi to double[] to get dist
         double placeLati = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LATITUDE_2));
         double placeLongi = cursor.getDouble(cursor.getColumnIndex(dbm.COL_LONGITUDE_3));
+        String mDistance = getDisfromMyLocationToPlace(placeLati, placeLongi);
 
+        //fav handler
         if (mIsFav == 1) {
             favIcon.setImageResource(R.drawable.ic_favorite_filled);
         } else if (mIsFav == 0) {
             favIcon.setImageResource(R.drawable.ic_favorite_border);
         }
 
-        //changeFavOption(mIsFav);
-
+        //image handler
         if (mImage != null) {
-
-            Picasso.with(context).load(mImage).into(flPicIV);
-
-        } else
-            flPicIV.setImageResource(R.drawable.photo_ph);
-
-        //??defining a place
-
-
-        String mDistance = getDisfromMyLocationToPlace(placeLati, placeLongi);
+            Picasso.with(context).load(mImage).into(picIV);
+        } else {
+            picIV.setImageResource(R.drawable.photo_ph);
+        }
 
         p.setId(mId);
         p.setFav(false);
-        //onClick favIcon
-        favIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                addToFav(p.getId());
-            }
-        });
-
-        //set values
+        //set values to views
         nameTV.setText(mName);
         addressTV.setText(mAddress);
         distanceTV.setText(mDistance);
 
     }
-
-
-    public void addToFav(int _id) {
-
-        Intent intent = new Intent(dbc.ACTION_FAVED);
-        intent.putExtra("_id", _id);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
 
     private String getDisfromMyLocationToPlace(double placeLati, double placeLongi) {
 
@@ -141,9 +120,20 @@ public class myFavesCursorAdapter extends CursorAdapter {
         placeLocation.setLatitude(placeLati);
         placeLocation.setLongitude(placeLongi);
 
-        float distanceInMeters = myLocation.distanceTo(placeLocation);
+        float disAsFloat = myLocation.distanceTo(placeLocation)/1000;
 
-        return "" + distanceInMeters;
+        int disInKM = (int) disAsFloat;
+
+        String dist = "" + disInKM + "KM away";
+
+        if (disInKM>100){
+            dist = "Really Far away!";
+        }
+        if (disInKM<1){
+            dist = "Right around the corner";
+        }
+
+        return dist;
 
     }
 }

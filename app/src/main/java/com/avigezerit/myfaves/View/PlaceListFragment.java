@@ -76,7 +76,6 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
 
 
-
         return v;
     }
 

@@ -1,12 +1,16 @@
 package com.avigezerit.myfaves.Control;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
@@ -28,14 +32,8 @@ public class getLocationHelper extends Activity implements android.location.Loca
     private double mLati;
     private double mLongi;
 
-    private boolean canAccessLocation= false;
-
     public getLocationHelper() {
-    }
 
-    public getLocationHelper(double mLati, double mLongi) {
-        this.mLati = mLati;
-        this.mLongi = mLongi;
     }
 
     public void setContext(Context context, Activity activity) {
@@ -44,60 +42,54 @@ public class getLocationHelper extends Activity implements android.location.Loca
     }
 
     //get location
-    private void getCurrentLocation() {
+    public void getCurrentLocation() {
 
         Log.d(TAG, "Getting Location");
 
+
+        //get an instance of the location service
+        locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+
+        //get the best location-provider that matches a certain criteria
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+        //set to provider
+        provider = locationManager.getBestProvider(criteria, true);
+
         checkPermission();
 
-        if (canAccessLocation){
-            //get an instance of the location service
-            locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(provider, 4000, 1, this);
 
-            //get the best location-provider that matches a certain criteria
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
-            criteria.setPowerRequirement(Criteria.POWER_LOW);
+        Location location = locationManager.getLastKnownLocation(provider);
 
-            //set to provider
-            provider = locationManager.getBestProvider(criteria, true);
+        writeToSharedPref(location.getLatitude(), location.getLongitude());
 
-
-            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 4000, 0, this);
-
-            Location location = locationManager.getLastKnownLocation(provider);
-
-            if (location != null) {
-                //setting location to favLocation
-                mLati = location.getLatitude();
-                mLongi = location.getLongitude();
-
-                float mLatiFloat = (float) mLati;
-                float mLongiFloat = (float) mLongi;
-
-            /*
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("location_lati", String.valueOf(mLati));
-            editor.putString("location_longi", String.valueOf(mLongi));
-            editor.commit();
-            */
-
-                locationManager.removeUpdates(this);
-        }
-        }
     }
 
     //check for permission
     public void checkPermission() {
 
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            String[] locationPermissions = new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION};
-            ActivityCompat.requestPermissions(activity, locationPermissions, REQUEST_PERMISSION);
+            String[] locationPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(locationPermissions, REQUEST_PERMISSION);
+            }
 
         }
+    }
+
+    private void writeToSharedPref(double mLt, double mLng) {
+
+        //setting location to Place
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putFloat("lt", (float) mLt);
+        editor.putFloat("lg", (float) mLng);
+        editor.commit();
 
     }
 
@@ -107,28 +99,17 @@ public class getLocationHelper extends Activity implements android.location.Loca
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             Log.d(TAG, "Granted! ");
-            canAccessLocation = true;
             getCurrentLocation();
         }
 
     }
 
-    public Double[] getPositionOfMyLocation() {
-
-        getCurrentLocation();
-
-        Double[] coords = new Double[]{mLati, mLongi};
-
-        Log.d(TAG, ""+mLati + " " + mLongi);
-
-        return coords;
-    }
-
-
     @Override
     public void onLocationChanged(Location location) {
 
-        Log.d(TAG, ""+location.getLatitude() + " " + location.getLongitude());
+        if (location != null) {
+            writeToSharedPref(location.getLatitude(), location.getLongitude());
+        }
     }
 
     @Override

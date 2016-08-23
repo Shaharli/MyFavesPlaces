@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -14,12 +15,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.avigezerit.myfaves.Control.LoadMapIF;
 import com.avigezerit.myfaves.Control.StartSearchingService;
+import com.avigezerit.myfaves.Control.getLocationHelper;
 import com.avigezerit.myfaves.Control.mReceivers.PowerConnectionReceiver;
 import com.avigezerit.myfaves.R;
 import com.google.android.gms.maps.CameraUpdate;
@@ -32,7 +36,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.URLEncoder;
 
-public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class SearchActivity extends AppCompatActivity implements LoadMapIF, View.OnClickListener, CheckBox.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
 
     private static final String TAG = SearchActivity.class.getSimpleName();
 
@@ -44,12 +48,13 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     EditText searchTermET;
     String searchTermFromET;
     Button startSearchBtn;
+    TextInputLayout searchTIL;
 
     //cb near by
     CheckBox cb;
     SeekBar sb;
-    private boolean searchNearBy = false;
-    int rs = 500;
+    LinearLayout rsbLL;
+    int rs = 1;
 
     //charging alert
     PowerConnectionReceiver receiver;
@@ -78,21 +83,31 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         searchTermET = (EditText) findViewById(R.id.searchPlaceET);
         startSearchBtn = (Button) findViewById(R.id.activateSearchBtn);
         startSearchBtn.setOnClickListener(this);
+        searchTIL = (TextInputLayout) findViewById(R.id.searchTIL);
 
         //init cb
         cb = (CheckBox) findViewById(R.id.nearByCB);
+        cb.setOnCheckedChangeListener(this);
+
+        //get location
+        getLocationHelper helper = new getLocationHelper();
+        helper.setContext(this, this);
+        helper.getCurrentLocation();
+
+        initRadiusSB();
+
+        rsbLL = (LinearLayout) findViewById(R.id.rsbLL);
+        rsbLL.setVisibility(View.GONE);
+
+    }
+
+    private void initRadiusSB() {
 
         //int sb
         sb = (SeekBar) findViewById(R.id.radiusSB);
         sb.setOnSeekBarChangeListener(this);
-        sb.setMax(20000);
-        sb.setKeyProgressIncrement(100);
-        sb.setProgress(500);
-
-        //test to get location
-        Button getLoactionBtn = (Button) findViewById(R.id.getCurrentLocationBtn);
-        getLoactionBtn.setOnClickListener(this);
-
+        sb.setMax(50);
+        sb.setProgress(10);
 
     }
 
@@ -182,55 +197,46 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()) {
+        Log.d(TAG, "clicked search");
 
-            case R.id.activateSearchBtn:
+        //get text from edit text
+        searchTermFromET = searchTermET.getText().toString();
 
-                Log.d(TAG, "clicked search");
+        boolean STisValid = false;
 
-                //get text from edit text
-                searchTermFromET = searchTermET.getText().toString();
-
-                //validate search term: short(1 char) or empty
-                if (searchTermFromET.length() < 2 || searchTermFromET.equals("")) {
-
-                    Toast.makeText(this, "Search with at least 2 letters", Toast.LENGTH_SHORT).show();
-                }
-
-                //encode url
-                String searchTermEncoded = URLEncoder.encode(searchTermFromET);
-
-
-                Intent intent = new Intent(this, StartSearchingService.class);
-
-                //send query params to service
-                intent.putExtra("term", searchTermEncoded);
-
-                //get cb status
-                if (cb.isChecked()) {
-                    intent.putExtra("cb", true);
-                } else {
-                    intent.putExtra("cb", false);
-                }
-
-                //go to search
-                startService(intent);
-
-                break;
-
-            case R.id.getCurrentLocationBtn:
-
-                //setting location to Place
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putFloat("lt", 32.0861945f);
-                editor.putFloat("lg", 34.8127379f);
-                editor.apply();
-                editor.commit();
-
-                break;
-
+        if (searchTermFromET.length() >= 2 && !searchTermFromET.isEmpty()) {
+            STisValid = true;
         }
+
+        //validate search term: short(1 char) or empty
+        if (STisValid) {
+
+            searchTIL.setErrorEnabled(false);
+
+            //encode url
+            String searchTermEncoded = URLEncoder.encode(searchTermFromET);
+
+            Intent intent = new Intent(this, StartSearchingService.class);
+
+            //send query params to service
+            intent.putExtra("term", searchTermEncoded);
+
+            //get cb status
+            if (cb.isChecked()) {
+                intent.putExtra("cb", true);
+            } else {
+                intent.putExtra("cb", false);
+            }
+
+            //go to search
+            startService(intent);
+
+            Toast.makeText(this, "Fetching Results...", Toast.LENGTH_SHORT).show();
+
+        } else{
+            searchTIL.setError("Requires at least 2 characters");
+        }
+
 
     }
 
@@ -248,7 +254,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-    rs = progress;
+        rs = progress;
     }
 
     @Override
@@ -258,11 +264,22 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        Toast.makeText(this,"Radius set:"+rs, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Radius set to: " + rs + "km", Toast.LENGTH_SHORT).show();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("rs", rs);
         editor.apply();
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+        if (!isChecked) {
+            rsbLL.setVisibility(View.GONE);
+        } else if (isChecked) {
+            rsbLL.setVisibility(View.VISIBLE);
+        }
+
     }
 }
 

@@ -7,13 +7,69 @@
     android:orientation="vertical"
     tools:context="com.avigezerit.myfaves.View.SearchActivity">
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/searchTIL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <EditText
         android:id="@+id/searchPlaceET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:imeOptions="actionSearch"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:hint="Search for a place"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/nearByCB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Search Only Near Me" />
+
+        <LinearLayout
+            android:id="@+id/rsbLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:gravity="center_horizontal"
+                android:text="1KM" />
+
+
+            <SeekBar
+                android:id="@+id/radiusSB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:gravity="center_horizontal"
+                android:text="50KM" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/activateSearchBtn"
@@ -21,33 +77,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/search" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <CheckBox
-            android:id="@+id/nearByCB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Search Only Near Me" />
-
-        <SeekBar
-            android:id="@+id/radiusSB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/getCurrentLocationBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="get Current Location" />
 
     <LinearLayout
         android:id="@+id/containerSearchLL"

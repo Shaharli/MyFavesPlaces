@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/favorite"
-        android:title="Add Place To Favorite"/>
+        android:title="Move Place To Favorite"/>
 
     <item android:id="@+id/navigate"
         android:title="Navigate to this Place"/>
