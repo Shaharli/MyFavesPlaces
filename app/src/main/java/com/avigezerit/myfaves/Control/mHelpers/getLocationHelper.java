@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
@@ -24,7 +23,7 @@ public class getLocationHelper extends FragmentActivity implements android.locat
     private static final String TAG = getLocationHelper.class.getSimpleName();
 
     //permission req code
-    private static final int REQUEST_PERMISSION = 101;
+    public static final int REQUEST_LOCATION_PERMISSION = 101;
 
     //get location
     private LocationManager locationManager;
@@ -45,40 +44,32 @@ public class getLocationHelper extends FragmentActivity implements android.locat
     //init manager & get current location
     public void getCurrentLocation() {
 
-        //get an instance of the location service
-        locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-        //get the best location-provider that matches a certain criteria
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
+            //get an instance of the location service
+            locationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
 
-        //set to provider
-        provider = locationManager.getBestProvider(criteria, true);
+            //get the best location-provider that matches a certain criteria
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+            criteria.setPowerRequirement(Criteria.POWER_LOW);
 
-        checkPermission();
+            //set to provider
+            provider = locationManager.getBestProvider(criteria, true);
 
-        locationManager.requestLocationUpdates(provider, 4000, 1, this);
+            Log.d(TAG, "provider: "+ provider);
 
-        Location location = locationManager.getLastKnownLocation(provider);
+            locationManager.requestLocationUpdates(provider, 4000, 1, this);
 
-        writeToSharedPref(location.getLatitude(), location.getLongitude());
+            Location location = locationManager.getLastKnownLocation(provider);
 
-    }
+            Log.d(TAG, "lat: "+ location.getLatitude() + " lng: " + location.getLongitude());
 
-    //check and request for location permission
-    public void checkPermission() {
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            String[] locationPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(locationPermissions, REQUEST_PERMISSION);
-            }
-
+            writeToSharedPref(location.getLatitude(), location.getLongitude());
         }
     }
+
 
     //saving location for app-level use
     private void writeToSharedPref(double mLt, double mLng) {
@@ -92,21 +83,12 @@ public class getLocationHelper extends FragmentActivity implements android.locat
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-            Log.d(TAG, "Granted! ");
-            getCurrentLocation();
-        }
-
-    }
 
     @Override
     public void onLocationChanged(Location location) {
 
         if (location != null) {
+            Log.d(TAG, "lat: "+ location.getLatitude() + " lng: " + location.getLongitude());
             writeToSharedPref(location.getLatitude(), location.getLongitude());
         }
     }

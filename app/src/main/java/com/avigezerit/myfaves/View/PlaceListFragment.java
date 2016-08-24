@@ -103,6 +103,7 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
 
             case R.id.favorite:
                 Intent intent = new Intent(dbc.ACTION_FAVED);
+                intent.putExtra("action", "add");
                 intent.putExtra("_id", selectedPlaceId);
                 LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
                 break;
@@ -117,7 +118,7 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
                 //Share name and address Intent
                 Intent sharePlace = new Intent();
                 sharePlace.setAction(Intent.ACTION_SEND);
-                sharePlace.putExtra(Intent.EXTRA_TEXT, "Check out this place I found: " + selectedPlaceName + "!" + "\nIt's located on: " + selectedPlaceAddress);
+                sharePlace.putExtra(Intent.EXTRA_TEXT, "Check out this place I found:\n" + selectedPlaceName + "!" + "\nIt's located on:\n" + selectedPlaceAddress);
                 sharePlace.setType("text/plain");
                 startActivity(sharePlace);
                 break;
@@ -129,8 +130,8 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
 
-        //selected place for map
-        return new CursorLoader(getActivity(), uri, null, null, null, null);
+        String[] whereArgs = new String[]{"" + 0};
+        return new CursorLoader(getActivity(), uri, null, dbc.COL_ISFAV_6 + "=?", whereArgs, null);
     }
 
     @Override

@@ -50,8 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
                 android:gravity="center_horizontal"
-                android:text="1KM" />
-
+                android:text="100M" />
 
             <SeekBar
                 android:id="@+id/radiusSB"
@@ -65,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
                 android:gravity="center_horizontal"
-                android:text="50KM" />
+                android:text="1KM" />
 
         </LinearLayout>
 

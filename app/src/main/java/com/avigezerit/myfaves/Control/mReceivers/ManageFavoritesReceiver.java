@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
+import android.widget.Toast;
 
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.Model.dbManager;
@@ -22,33 +22,33 @@ public class ManageFavoritesReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d(TAG, intent.getAction());
-
         //prepare to update db
         Uri uri = dbContract.mPlacesTable.CONTENT_URI;
         ContentValues cv = new ContentValues();
         Cursor c = null;
-        int id;
+        int id = intent.getIntExtra("_id", 0);
+        String act = intent.getStringExtra("action");
 
         //get the id of the place that will be added to fave
         c = context.getContentResolver().query(uri, null, null, null, null);
-        id = c.getInt(c.getColumnIndex(dbc.COL_ID_0));
-
+        c.moveToFirst();
+        //id = c.getInt(c.getColumnIndex(dbc.COL_ID_0));
         String[] whereArgs = new String[]{"" + id};
 
-        if (intent.getAction() == dbc.ACTION_FAVED) {
+        if (act.equals("add")) {
 
             cv.put(dbManager.COL_ISFAV_6, 1);
+            Toast.makeText(context, "Place added to Faves", Toast.LENGTH_SHORT).show();
 
-            context.getContentResolver().update(uri, cv, dbc.COL_ID_0 + "=?", whereArgs);
 
+        } else if (act.equals("remove")) {
 
-        } else if (intent.getAction() == dbc.ACTION_UNFAVED) {
-
-            context.getContentResolver().delete(uri, dbc.COL_ID_0 + "=?", whereArgs);
+            cv.put(dbManager.COL_ISFAV_6, 0);
+            Toast.makeText(context, "Place removed from Faves", Toast.LENGTH_SHORT).show();
 
         }
 
+        context.getContentResolver().update(uri, cv, dbc.COL_ID_0 + "=?", whereArgs);
         context.getContentResolver().notifyChange(uri, null);
         c.close();
 

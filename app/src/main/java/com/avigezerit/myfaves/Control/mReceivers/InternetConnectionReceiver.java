@@ -11,25 +11,19 @@ import android.widget.Toast;
 
 public class InternetConnectionReceiver extends BroadcastReceiver {
 
+    public static final String TAG = InternetConnectionReceiver.class.getSimpleName();
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        //TODO make it work
-
-        if (isNetworkAvailable(context)) {
-            Toast.makeText(context, "connect to the internet", Toast.LENGTH_LONG).show();
-
-        } else {
-            Toast.makeText(context, "Connection faild", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public boolean isNetworkAvailable(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        if (!isConnected) {
+            Toast.makeText(context, "OH NO! Internet disconnected!", Toast.LENGTH_LONG).show();
         }
-        return false;
     }
 }

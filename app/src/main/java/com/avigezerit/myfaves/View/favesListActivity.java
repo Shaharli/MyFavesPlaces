@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -20,37 +21,29 @@ import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.R;
 
-/* * * * * * * * * * * * * FAVORITE PLACES LIST ACTIVITY - MAIN * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * *  FAVORITE PLACES LIST - ACTIVITY  * * * * * * * * * * * * * * * * * */
 
-public class FavesListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
+public class FavesListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, View.OnClickListener {
 
     private static final String TAG = FavesListActivity.class.getSimpleName();
 
-    myFavesCursorAdapter adapter;
-    Uri uri = dbContract.mPlacesTable.CONTENT_URI;
+    //db related
     private dbContract.mPlacesTable dbc;
-
-    Cursor c;
-
+    private myFavesCursorAdapter adapter;
+    private Uri uri = dbContract.mPlacesTable.CONTENT_URI;
+    private Cursor c;
     static final int FAV_CURSOR_ID = 202;
 
+    //menu item adaptation
+    Menu favMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favs_list);
 
-        //ask location
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent goToSearch = new Intent(FavesListActivity.this, SearchActivity.class);
-                startActivity(goToSearch);
-            }
-        });
+        fab.setOnClickListener(this);
 
         c = null;
         adapter = new myFavesCursorAdapter(this, c);
@@ -62,12 +55,19 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(FAV_CURSOR_ID, null, this);
 
+
+        //TODO CHANGE ITEM IN CONTEXT MENU
+
+    }
+
+    private void changeItemTitleInMenu() {
+        MenuItem favItemMenu = favMenu.findItem(R.id.favorite);
+        favItemMenu.setTitle("Remove Place From Favorites");
     }
 
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-
         String[] whereArgs = new String[]{"" + 1};
         return new CursorLoader(this, uri, null, dbc.COL_ISFAV_6 + "=?", whereArgs, null);
     }
@@ -75,8 +75,8 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
     @Override
     public void onLoadFinished(Loader loader, Object data) {
         c = (Cursor) data;
-        adapter.swapCursor(c);
         c.setNotificationUri(getContentResolver(), uri);
+        adapter.swapCursor(c);
     }
 
     @Override
@@ -87,14 +87,16 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         getMenuInflater().inflate(R.menu.place_context_menu, menu);
+        favMenu = menu;
+        changeItemTitleInMenu();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        menu.removeItem(R.id.favorite);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -130,14 +132,14 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
 
         switch (item.getItemId()) {
 
-            /*
             case R.id.favorite:
-                //TODO FIX BUG REMOVE FAV
-                Intent intent = new Intent(dbc.ACTION_UNFAVED);
+                //remove a place from list
+                Intent intent = new Intent(dbc.ACTION_FAVED);
+                intent.putExtra("action", "remove");
                 intent.putExtra("_id", selectedPlaceId);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 break;
-            */
+
             case R.id.navigate:
                 //navigate with google maps intent
                 Uri gmmIntentUri = Uri.parse("google.navigation:q=" + selectedPlaceLati + ", " + selectedPlaceLongi);
@@ -155,5 +157,16 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if (v.getId()==R.id.fab) {
+            Intent goToSearch = new Intent(FavesListActivity.this, SearchActivity.class);
+            startActivity(goToSearch);
+        }
+
+
     }
 }

@@ -1,14 +1,18 @@
 package com.avigezerit.myfaves.View;
 
+import android.Manifest;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -59,6 +63,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     SeekBar sb;
     LinearLayout rsbLL;
     int rs = 1;
+    getLocationHelper helper;
 
     //charging alert
     PowerConnectionReceiver powerReceiver;
@@ -107,11 +112,6 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         rsbLL = (LinearLayout) findViewById(R.id.rsbLL);
         rsbLL.setVisibility(View.GONE);
 
-        //get location
-        getLocationHelper helper = new getLocationHelper();
-        helper.setContext(this, this);
-        helper.getCurrentLocation();
-
         //register powerReceiver
         initReceivers();
     }
@@ -135,8 +135,8 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     }
 
     private void initRadiusSB() {
-        sb.setMax(50);
-        sb.setProgress(10);
+        sb.setMax(1000);
+        sb.setProgress(100);
     }
 
     public boolean isLanscapeMode() {
@@ -229,19 +229,17 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     }
 
     @Override
-    protected void onPause() {
-
+    protected void onDestroy() {
         //unregister receiver to avoid harassment!
         if (powerReceiver != null) {
+            Log.d(TAG, "unregistered power");
             unregisterReceiver(powerReceiver);
         }
         if (internetReceiver != null) {
+            Log.d(TAG, "unregistered internet");
             unregisterReceiver(internetReceiver);
         }
-
-        super.onPause();
-
-
+        super.onDestroy();
     }
 
     //// UI EVENTS ////
@@ -292,7 +290,11 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        int stepSize = 100;
+        progress = (Math.round(progress/stepSize))*stepSize;
+        seekBar.setProgress(progress);
         rs = progress;
+        Log.d(TAG, "" + progress);
     }
 
     @Override
@@ -302,11 +304,20 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        Toast.makeText(this, "Radius set to: " + rs + "km", Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(this, "Radius set to: " + rs + "Meters", Toast.LENGTH_SHORT).show();
+        writeToSharedPref(rs);
+
+    }
+
+    //saving radius for app-level use
+    private void writeToSharedPref(int rs) {
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("rs", rs);
-        editor.apply();
+        editor.commit();
+
     }
 
     @Override
@@ -315,11 +326,43 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         if (!isChecked) {
             rsbLL.setVisibility(View.GONE);
         } else if (isChecked) {
+            //get location
+            helper = new getLocationHelper();
+            helper.setContext(this, this);
+            checkPermission();
+            helper.getCurrentLocation();
             rsbLL.setVisibility(View.VISIBLE);
         }
 
     }
 
+    //check and request for location permission
+    public void checkPermission() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                String[] locationPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+                ActivityCompat.requestPermissions(this, locationPermissions, helper.REQUEST_LOCATION_PERMISSION);
+
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "Granted! ");
+            helper.getCurrentLocation();
+        }
+
+
+    }
 }
+
+
 
 

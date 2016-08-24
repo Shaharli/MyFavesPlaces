@@ -13,26 +13,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.AppBarOverlay">
+
+        <!--ACTIVITIES-->
+
         <activity android:name=".View.FavesListActivity" />
-
-        <service android:name=".Control.mHelpers.StartSearchingService">
-            <intent-filter>
-                <action android:name="com.avigezerit.myfaves.action.SEARCH" />
-            </intent-filter>
-        </service>
-
-        <receiver android:name=".Control.mReceivers.ManageFavoritesReceiver">
-            <intent-filter>
-                <action android:name="com.avigezerit.myfaves.action.FAVED" />
-                <action android:name="com.avigezerit.myfaves.action.UNFAVED" />
-            </intent-filter>
-        </receiver>
-
-        <provider
-            android:name=".Model.dbProvider"
-            android:authorities="com.avigezerit.myfaves"
-            android:enabled="true"
-            android:exported="true" />
 
         <activity android:name=".View.SearchActivity">
             <intent-filter>
@@ -40,16 +24,47 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".View.SettingsActivity"
             android:theme="@style/Theme.AppCompat.Dialog" />
 
+        <!--SERVICES-->
+
+        <service android:name=".Control.mHelpers.StartSearchingService">
+            <intent-filter>
+                <action android:name="com.avigezerit.myfaves.action.SEARCH" />
+            </intent-filter>
+        </service>
+
+        <!--RECEIVERS-->
+
+        <receiver android:name=".Control.mReceivers.ManageFavoritesReceiver">
+            <intent-filter>
+                <action android:name="com.avigezerit.myfaves.action.FAVED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".Control.mReceivers.PowerConnectionReceiver" />
+        <receiver android:name=".Control.mReceivers.InternetConnectionReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        <!--PROVIDERS-->
+
+        <provider
+            android:name=".Model.dbProvider"
+            android:authorities="com.avigezerit.myfaves"
+            android:enabled="true"
+            android:exported="true" />
+
+
+        <!--META-DATA-->
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB2eNueotW9eTU2scgoiGd-KjpvRfWmKHM" />
-
-        <receiver android:name=".Control.mReceivers.PowerConnectionReceiver"/>
-        <receiver android:name=".Control.mReceivers.InternetConnectionReceiver"/>
 
     </application>
 

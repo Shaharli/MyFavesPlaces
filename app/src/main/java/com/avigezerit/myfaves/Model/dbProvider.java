@@ -63,8 +63,9 @@ public class dbProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
         int rowsUpdated = dbh.getWritableDatabase().update(dbContract.mPlacesTable.PLACES, values, selection, selectionArgs);
-        Log.d(TAG, "DB Faved : "+""+values.get(dbc.COL_ISFAV_6));
+        Log.d(TAG, "DB Faved : "+""+values.get(dbc.COL_ISFAV_6) + values.getAsString(dbc.COL_NAME_1));
         getContext().getContentResolver().notifyChange(uri, null);
+
         return rowsUpdated;
     }
 }
