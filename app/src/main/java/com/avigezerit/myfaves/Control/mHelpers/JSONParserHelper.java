@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.avigezerit.myfaves.Model.dbContract;
+import com.avigezerit.myfaves.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +22,7 @@ public class JSONParserHelper {
 
     public static final String TAG = JSONParserHelper.class.getSimpleName();
 
-    public void parseJSON(String searchResultsToParse, boolean nearBy, Context cx) {
+    public void parseJSON(String searchResultsToParse, Context cx) {
 
         Log.d(TAG, "JSON Parser activated");
         Log.d(TAG, searchResultsToParse);
@@ -45,8 +46,8 @@ public class JSONParserHelper {
 
             //check if result ok
             String resultsStatus = resultsMainObject.getString("status");
-            if (!resultsStatus.equals("OK")) {
-                Toast.makeText(cx, "No Results found!", Toast.LENGTH_SHORT).show();
+            if (resultsStatus.equals("ZERO_RESULTS")) {
+                Toast.makeText(cx, R.string.no_results_alert, Toast.LENGTH_SHORT).show();
             }
 
             //extracting every result data using JSON array

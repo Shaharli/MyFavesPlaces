@@ -7,9 +7,8 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-/**
- * Created by Shaharli on 16/08/2016.
- */
+/* * * * * * * * * * * * *  PLACES DATABASE PROVIDER  * * * * * * * * * * * * */
+
 public class dbProvider extends ContentProvider {
 
     private static final String TAG = dbProvider.class.getSimpleName();

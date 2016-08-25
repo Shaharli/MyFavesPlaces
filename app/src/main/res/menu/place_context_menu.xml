@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/favorite"
-        android:title="Move this Place To Favorites"/>
+        android:title="@string/menu_add_fav"/>
 
     <item android:id="@+id/navigate"
-        android:title="Navigate to this Place"/>
+        android:title="@string/menu_navigate"/>
 
     <item android:id="@+id/share"
-        android:title="Share this Place"/>
+        android:title="@string/menu_share"/>
 
 </menu>

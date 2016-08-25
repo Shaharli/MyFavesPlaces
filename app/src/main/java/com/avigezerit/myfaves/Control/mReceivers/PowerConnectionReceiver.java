@@ -3,8 +3,9 @@ package com.avigezerit.myfaves.Control.mReceivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
+
+import com.avigezerit.myfaves.R;
 
 /* * * * * * * * * * * * * * * * *  POWER CONNECTION - RECEIVER  * * * * * * * * * * * * * * * * * */
 
@@ -16,16 +17,6 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        //TODO CHECK THAT IT WORKS
-
-        if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) {
-            Log.d(TAG, "charging");
-            Toast.makeText(context, "Charging...!", Toast.LENGTH_SHORT).show();
-
-
-        } else if (intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)) {
-            Log.d(TAG, "not charging");
-            Toast.makeText(context, "OH NO! You're not charging anymore!", Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(context, R.string.charging_alert, Toast.LENGTH_SHORT).show();
     }
 }

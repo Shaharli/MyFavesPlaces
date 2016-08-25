@@ -19,7 +19,7 @@
         android:layout_gravity="center_horizontal"
         android:imeOptions="actionSearch"
         android:singleLine="true"
-        android:hint="Search for a place"/>
+        android:hint="@string/search_place_hint"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Search Only Near Me" />
+            android:text="@string/search_near_cb" />
 
         <LinearLayout
             android:id="@+id/rsbLL"
@@ -74,8 +74,11 @@
         android:id="@+id/activateSearchBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_gravity="center_horizontal"
-        android:text="@string/search" />
+        android:text="@string/search"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/white"/>
 
     <LinearLayout
         android:id="@+id/containerSearchLL"

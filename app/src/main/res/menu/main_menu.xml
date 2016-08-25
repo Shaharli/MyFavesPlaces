@@ -3,10 +3,10 @@
 
     <item
         android:id="@+id/settings"
-        android:title="Settings" />
+        android:title="@string/menu_settings" />
 
     <item
         android:id="@+id/faves"
-        android:title="My Faves" />
+        android:title="@string/menu_my_faves" />
 
 </menu>

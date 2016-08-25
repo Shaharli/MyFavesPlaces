@@ -14,11 +14,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-/* * * * * * * * * * * * * * * * * * * *  LOCATION HELPER  * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * *  LOCATION PROVIDER - HELPER  * * * * * * * * * * * * * * * * * * * */
 
 
 public class getLocationHelper extends FragmentActivity implements android.location.LocationListener {
-
 
     private static final String TAG = getLocationHelper.class.getSimpleName();
 
@@ -35,6 +34,8 @@ public class getLocationHelper extends FragmentActivity implements android.locat
 
     public getLocationHelper() {
     }
+
+    //// INITIALIZING METHODS ////
 
     public void setContext(Context context, Activity activity) {
         this.context = context;
@@ -70,11 +71,9 @@ public class getLocationHelper extends FragmentActivity implements android.locat
         }
     }
 
-
-    //saving location for app-level use
     private void writeToSharedPref(double mLt, double mLng) {
 
-        //setting location to PlaceClass
+        //saving location for app-level use
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putFloat("lt", (float) mLt);
@@ -83,6 +82,7 @@ public class getLocationHelper extends FragmentActivity implements android.locat
 
     }
 
+    //// LOCATION METHODS ////
 
     @Override
     public void onLocationChanged(Location location) {

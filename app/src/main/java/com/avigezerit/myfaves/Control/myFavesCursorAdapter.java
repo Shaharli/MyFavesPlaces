@@ -14,15 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.avigezerit.myfaves.Model.dbContract;
-import com.avigezerit.myfaves.Model.dbManager;
 import com.avigezerit.myfaves.R;
 import com.squareup.picasso.Picasso;
 
-/* * * * * * * * * * * * * PLACES LIST CURSOR ADAPTER  * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * *  PLACES LIST - CURSOR ADAPTER  * * * * * * * * * * * * * * * * * */
 
 public class myFavesCursorAdapter extends CursorAdapter {
 
-    //Log
     private static final String TAG = myFavesCursorAdapter.class.getSimpleName();
 
     //context holder
@@ -32,7 +30,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
     //instance of place obj
     PlaceClass p = new PlaceClass();
 
-    //db
+    //db related
     private dbContract.mPlacesTable dbc;
     Uri uri = dbContract.mPlacesTable.CONTENT_URI;
 
@@ -43,6 +41,10 @@ public class myFavesCursorAdapter extends CursorAdapter {
     ImageView picIV;
     ImageView favIcon;
 
+    //km or mi status
+    String distanceAsString;
+    public static boolean isKM = true;
+
 
     public myFavesCursorAdapter(Context context, Cursor c) {
         super(context, c);
@@ -52,7 +54,7 @@ public class myFavesCursorAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        //TO DONE: inflate view
+        //inflate view
         view = LayoutInflater.from(context).inflate(R.layout.place_item, null);
         return view;
 
@@ -72,13 +74,13 @@ public class myFavesCursorAdapter extends CursorAdapter {
         int mId = cursor.getInt(cursor.getColumnIndex(dbc.COL_ID_0));
         String mName = cursor.getString(cursor.getColumnIndex(dbc.COL_NAME_1));
         String mAddress = cursor.getString(cursor.getColumnIndex(dbc.COL_ADDRESS_4));
-        String mImage = cursor.getString(cursor.getColumnIndex(dbManager.COL_IMAGE_5));
+        String mImage = cursor.getString(cursor.getColumnIndex(dbc.COL_IMAGE_5));
         int mIsFav = cursor.getInt(cursor.getColumnIndex(dbc.COL_ISFAV_6));
 
         //extract lati & longi to double[] to get dist
-        double placeLati = cursor.getDouble(cursor.getColumnIndex(dbManager.COL_LATITUDE_2));
-        double placeLongi = cursor.getDouble(cursor.getColumnIndex(dbManager.COL_LONGITUDE_3));
-        String mDistance = getDisfromMyLocationToPlace(placeLati, placeLongi);
+        double placeLati = cursor.getDouble(cursor.getColumnIndex(dbc.COL_LATITUDE_2));
+        double placeLongi = cursor.getDouble(cursor.getColumnIndex(dbc.COL_LONGITUDE_3));
+        String mDistance = getDisFromMyLocationToPlace(placeLati, placeLongi);
 
         //fav handler
         if (mIsFav == 1) {
@@ -104,7 +106,9 @@ public class myFavesCursorAdapter extends CursorAdapter {
 
     }
 
-    private String getDisfromMyLocationToPlace(double placeLati, double placeLongi) {
+    //// DISTANCE ADAPTATION ////
+
+    private String getDisFromMyLocationToPlace(double placeLati, double placeLongi) {
 
         //get my current location from shared pref
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
@@ -120,22 +124,39 @@ public class myFavesCursorAdapter extends CursorAdapter {
         placeLocation.setLatitude(placeLati);
         placeLocation.setLongitude(placeLongi);
 
+        //get distance and determine km or miles
         float disAsFloat = myLocation.distanceTo(placeLocation) / 1000;
+        int distance = (int) disAsFloat;
 
-        int disInKM = (int) disAsFloat;
+        if (!isKM) {
 
-        String dist = "" + disInKM + "KM away";
+            distance = convertKMtoMiles(distance);
+            distanceAsString = "" + distance + context.getString(R.string.dis_miles);
 
-        if (disInKM > 100) {
-            dist = "Really Far away!";
+        } else {
+
+            distanceAsString = "" + distance + context.getString(R.string.dis_km);
         }
-        if (disInKM < 1) {
-            dist = "Right around the corner";
-        }
 
-        //TODO miles from km
+        textIndicationForReallyCloseOrReallyFarPlaces(distance);
 
-        return dist;
+        return distanceAsString;
 
     }
+
+    private void textIndicationForReallyCloseOrReallyFarPlaces(int distance) {
+
+        if (distance > 250) {
+            distanceAsString += context.getString(R.string.dis_far_extra);
+        } else if (distance == 0) {
+            distanceAsString += context.getString(R.string.dis_near_extra);
+        }
+    }
+
+    private int convertKMtoMiles(int disKM) {
+        int disMiles = (int) (disKM / 1.609344);
+        return disMiles;
+    }
+
+
 }

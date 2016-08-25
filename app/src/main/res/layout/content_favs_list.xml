@@ -21,5 +21,18 @@
         android:divider="@drawable/horiz_space_20"
         android:showDividers="middle" />
 
+    <TextView
+        android:id="@+id/noFavesTV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/no_faves"
+        android:textStyle="italic"
+        android:textColor="@color/ColorMultiply"
+        android:gravity="center"
+        android:visibility="invisible"/>
+
+
+
+
 
 </RelativeLayout>

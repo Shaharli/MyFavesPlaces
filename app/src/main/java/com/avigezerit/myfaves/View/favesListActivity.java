@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.avigezerit.myfaves.Control.mHelpers.ContextMenuActionsHelper;
 import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.R;
@@ -54,17 +54,24 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
         //using cursor Loader to access db
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(FAV_CURSOR_ID, null, this);
-
-
-        //TODO CHANGE ITEM IN CONTEXT MENU
-
     }
+
+    //// INITIALIZING METHODS ////
 
     private void changeItemTitleInMenu() {
         MenuItem favItemMenu = favMenu.findItem(R.id.favorite);
-        favItemMenu.setTitle("Remove Place From Favorites");
+        favItemMenu.setTitle(R.string.menu_remove_fav);
     }
 
+    private void checkIfNoFavesYet(myFavesCursorAdapter currentAdapter) {
+
+        if (currentAdapter.getCount() == 0) {
+            findViewById(R.id.noFavesTV).setVisibility(View.VISIBLE);
+        } else
+            findViewById(R.id.noFavesTV).setVisibility(View.INVISIBLE);
+    }
+
+    //// LOADING DATABASE METHODS ////
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
@@ -77,12 +84,15 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
         c = (Cursor) data;
         c.setNotificationUri(getContentResolver(), uri);
         adapter.swapCursor(c);
+        checkIfNoFavesYet(adapter);
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
 
     }
+
+    //// OPTIONS & CONTEXT MENU ////
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -92,11 +102,43 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
     }
 
     @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        //menu helper
+        ContextMenuActionsHelper ch = new ContextMenuActionsHelper(FavesListActivity.this);
+
+        //get position in list view
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        //moving the cursor to a info.position
+        c.moveToPosition(info.position);
+
+        //extract information about a place
+        String selectedPlaceName = c.getString(c.getColumnIndex(dbc.COL_NAME_1));
+        int selectedPlaceId = c.getInt(c.getColumnIndex(dbc.COL_ID_0));
+        String selectedPlaceAddress = c.getString(c.getColumnIndex(dbc.COL_ADDRESS_4));
+        double selectedPlaceLati = c.getDouble(c.getColumnIndex(dbc.COL_LATITUDE_2));
+        double selectedPlaceLongi = c.getDouble(c.getColumnIndex(dbc.COL_LONGITUDE_3));
+
+        switch (item.getItemId()) {
+            case R.id.favorite:
+                ch.removePlaceFromListByID(selectedPlaceId);
+                break;
+            case R.id.navigate:
+                ch.navigateToPlaceUsingGoogleMaps(selectedPlaceLati, selectedPlaceLongi);
+                break;
+            case R.id.share:
+                ch.sharePlaceNameAddress(selectedPlaceName, selectedPlaceAddress);
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -115,58 +157,14 @@ public class FavesListActivity extends AppCompatActivity implements LoaderManage
         return true;
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-
-        //get position in list view
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
-        //moving the cursor to a info.position
-        c.moveToPosition(info.position);
-
-        String selectedPlaceName = c.getString(c.getColumnIndex(dbc.COL_NAME_1));
-        int selectedPlaceId = c.getInt(c.getColumnIndex(dbc.COL_ID_0));
-        String selectedPlaceAddress = c.getString(c.getColumnIndex(dbc.COL_ADDRESS_4));
-        double selectedPlaceLati = c.getDouble(c.getColumnIndex(dbc.COL_LATITUDE_2));
-        double selectedPlaceLongi = c.getDouble(c.getColumnIndex(dbc.COL_LONGITUDE_3));
-
-        switch (item.getItemId()) {
-
-            case R.id.favorite:
-                //remove a place from list
-                Intent intent = new Intent(dbc.ACTION_FAVED);
-                intent.putExtra("action", "remove");
-                intent.putExtra("_id", selectedPlaceId);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-                break;
-
-            case R.id.navigate:
-                //navigate with google maps intent
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + selectedPlaceLati + ", " + selectedPlaceLongi);
-                Intent navigateToPlace = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                navigateToPlace.setPackage("com.google.android.apps.maps");
-                startActivity(navigateToPlace);
-                break;
-            case R.id.share:
-                //Share name and address Intent
-                Intent sharePlace = new Intent();
-                sharePlace.setAction(Intent.ACTION_SEND);
-                sharePlace.putExtra(Intent.EXTRA_TEXT, "Check out this place I found: " + selectedPlaceName + "!" + "\nIt's located on: " + selectedPlaceAddress);
-                sharePlace.setType("text/plain");
-                startActivity(sharePlace);
-                break;
-        }
-        return true;
-    }
+    //// UI EVENTS ////
 
     @Override
     public void onClick(View v) {
 
-        if (v.getId()==R.id.fab) {
+        if (v.getId() == R.id.fab) {
             Intent goToSearch = new Intent(FavesListActivity.this, SearchActivity.class);
             startActivity(goToSearch);
         }
-
-
     }
 }

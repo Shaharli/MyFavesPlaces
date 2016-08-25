@@ -4,14 +4,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-/* * * * * * * * * * * * * PLACES DATABASE * * * * * * * * * * * * */
+/* * * * * * * * * * * * *  PLACES DATABASE  * * * * * * * * * * * * */
 
 public class dbHelper extends SQLiteOpenHelper {
 
     //constants db name & table name
     public static final String DB_PLACES_NAME = "my_places.db";
     public static final int DB_VERSION = 1;
-
     private dbContract.mPlacesTable dbc;
 
     //get context

@@ -4,7 +4,6 @@ package com.avigezerit.myfaves.View;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
@@ -18,10 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
+import com.avigezerit.myfaves.Control.mHelpers.ContextMenuActionsHelper;
 import com.avigezerit.myfaves.Control.mHelpers.LoadMapIF;
 import com.avigezerit.myfaves.Control.mReceivers.ManageFavoritesReceiver;
 import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
@@ -29,24 +27,20 @@ import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.R;
 import com.google.android.gms.maps.model.LatLng;
 
+/* * * * * * * * * * * * * * * * *  SEARCH PLACES LIST - FRAGMENT  * * * * * * * * * * * * * * * * * */
 
 public class PlaceListFragment extends Fragment implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks {
 
     private static final String TAG = PlaceListFragment.class.getSimpleName();
 
     //xml ref
-    EditText searchTermET;
-    String searchTermFromET;
-    Button startSearchBtn;
     ListView resultsLV;
 
     //db related
-    myFavesCursorAdapter adapter;
-    Uri uri = dbContract.mPlacesTable.CONTENT_URI;
     private dbContract.mPlacesTable dbc;
-
-    Cursor c;
-
+    private myFavesCursorAdapter adapter;
+    private Uri uri = dbContract.mPlacesTable.CONTENT_URI;
+    private Cursor c;
     static final int SEARCH_RESULT_CURSOR_ID = 101;
 
     public PlaceListFragment() {
@@ -59,8 +53,11 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
 
         View v = inflater.inflate(R.layout.fragment_place_list, container, false);
 
+        //init cursor
         Cursor cursor = null;
         adapter = new myFavesCursorAdapter(getActivity(), cursor);
+
+        //init listview
         resultsLV = (ListView) v.findViewById(R.id.searchPlacesResultLV);
         resultsLV.setAdapter(adapter);
         resultsLV.setOnItemClickListener(this);
@@ -70,14 +67,15 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(SEARCH_RESULT_CURSOR_ID, null, this);
 
-        //powerReceiver for adding to favorites
+        //init receiver for adding places to favorites
         ManageFavoritesReceiver receiver = new ManageFavoritesReceiver();
         IntentFilter filter = new IntentFilter(dbc.ACTION_FAVED);
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
 
-
         return v;
     }
+
+    //// OPTIONS & CONTEXT MENU ////
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -86,6 +84,9 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+
+        //menu helper
+        ContextMenuActionsHelper ch = new ContextMenuActionsHelper(getActivity());
 
         //get position in list view
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -102,30 +103,20 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
         switch (item.getItemId()){
 
             case R.id.favorite:
-                Intent intent = new Intent(dbc.ACTION_FAVED);
-                intent.putExtra("action", "add");
-                intent.putExtra("_id", selectedPlaceId);
-                LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
+                ch.addPlaceToFavesByID(selectedPlaceId);
                 break;
             case R.id.navigate:
-                //navigate with google maps intent
-                Uri gmmIntentUri = Uri.parse("google.navigation:q="+selectedPlaceLati+", "+selectedPlaceLongi);
-                Intent navigateToPlace = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                navigateToPlace.setPackage("com.google.android.apps.maps");
-                startActivity(navigateToPlace);
+                ch.navigateToPlaceUsingGoogleMaps(selectedPlaceLati, selectedPlaceLongi);
                 break;
             case R.id.share:
-                //Share name and address Intent
-                Intent sharePlace = new Intent();
-                sharePlace.setAction(Intent.ACTION_SEND);
-                sharePlace.putExtra(Intent.EXTRA_TEXT, "Check out this place I found:\n" + selectedPlaceName + "!" + "\nIt's located on:\n" + selectedPlaceAddress);
-                sharePlace.setType("text/plain");
-                startActivity(sharePlace);
+                ch.sharePlaceNameAddress(selectedPlaceName, selectedPlaceAddress);
                 break;
         }
 
         return true;
     }
+
+    //// LOADING DATABASE METHODS ////
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
@@ -147,6 +138,7 @@ public class PlaceListFragment extends Fragment implements ListView.OnItemClickL
 
     }
 
+    //// UI EVENTS ////
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

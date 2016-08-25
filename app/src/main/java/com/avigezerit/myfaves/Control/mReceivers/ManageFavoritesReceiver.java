@@ -9,7 +9,7 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.avigezerit.myfaves.Model.dbContract;
-import com.avigezerit.myfaves.Model.dbManager;
+import com.avigezerit.myfaves.R;
 
 /* * * * * * * * * * * * * * * * *  FAVORITES MANAGER - RECEIVER  * * * * * * * * * * * * * * * * * */
 
@@ -37,14 +37,14 @@ public class ManageFavoritesReceiver extends BroadcastReceiver {
 
         if (act.equals("add")) {
 
-            cv.put(dbManager.COL_ISFAV_6, 1);
-            Toast.makeText(context, "Place added to Faves", Toast.LENGTH_SHORT).show();
+            cv.put(dbc.COL_ISFAV_6, 1);
+            Toast.makeText(context, R.string.place_added_alert, Toast.LENGTH_SHORT).show();
 
 
         } else if (act.equals("remove")) {
 
-            cv.put(dbManager.COL_ISFAV_6, 0);
-            Toast.makeText(context, "Place removed from Faves", Toast.LENGTH_SHORT).show();
+            cv.put(dbc.COL_ISFAV_6, 0);
+            Toast.makeText(context, R.string.place_removed_alert, Toast.LENGTH_SHORT).show();
 
         }
 

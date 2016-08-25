@@ -25,6 +25,6 @@ public class StartSearchingService extends IntentService {
 
         //use helper to parse json
         JSONParserHelper parser = new JSONParserHelper();
-        parser.parseJSON(searchResultsToParse, searchNearBy, getApplicationContext());
+        parser.parseJSON(searchResultsToParse, getApplicationContext());
     }
 }

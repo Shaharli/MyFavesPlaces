@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.avigezerit.myfaves.Control.myFavesCursorAdapter;
 import com.avigezerit.myfaves.Model.dbContract;
 import com.avigezerit.myfaves.R;
 
@@ -44,7 +45,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
         //set the list values:
         prefUnit.setEntries(new String[]{"Kilometers", "Miles"});
-        prefUnit.setEntryValues(new String[]{"Kilometers", "Miles"});
+        prefUnit.setEntryValues(new String[]{getString(R.string.km), getString(R.string.miles)});
 
         //set the summaries:
         prefUnit.setSummary(unit);
@@ -62,7 +63,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
 
-
         //get the key:
         String key = preference.getKey();
         Log.d(TAG, "changed " + key + " -> " + newValue);
@@ -70,6 +70,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         if (key.equals("unit")) {
             //unit: change the summary
             preference.setSummary((String) newValue);
+            if (newValue.equals("Miles")){
+                myFavesCursorAdapter.isKM = false;
+            } else if (newValue.equals("Kilometers")){
+                myFavesCursorAdapter.isKM = true;
+            }
+            getContentResolver().notifyChange(uri, null);
         }
 
         return true;
@@ -87,7 +93,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             //delete all faves
             String[] whereArgs = new String[]{""+1};
             int rowsDeleted = getContentResolver().delete(uri, dbc.COL_ISFAV_6+"=?", whereArgs);
-            Toast.makeText(this, ""+rowsDeleted+" favorites deleted!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, ""+rowsDeleted+getString(R.string.fav_deleted), Toast.LENGTH_SHORT).show();
+        } else if (key.equals("unit")) {
+
 
         }
 

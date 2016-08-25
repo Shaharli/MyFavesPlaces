@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import com.avigezerit.myfaves.R;
+
 /* * * * * * * * * * * * * * * * *  INTERNET CONNECTION - RECEIVER  * * * * * * * * * * * * * * * * * */
 
 public class InternetConnectionReceiver extends BroadcastReceiver {
@@ -23,7 +25,7 @@ public class InternetConnectionReceiver extends BroadcastReceiver {
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         if (!isConnected) {
-            Toast.makeText(context, "OH NO! Internet disconnected!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.no_connection_alert, Toast.LENGTH_LONG).show();
         }
     }
 }

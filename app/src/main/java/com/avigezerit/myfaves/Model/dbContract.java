@@ -2,9 +2,8 @@ package com.avigezerit.myfaves.Model;
 
 import android.net.Uri;
 
-/**
- * Created by Shaharli on 16/08/2016.
- */
+/* * * * * * * * * * * * *  PLACES DATABASE CONTRACT  * * * * * * * * * * * * */
+
 public class dbContract {
 
     public static class mPlacesTable {
@@ -30,11 +29,8 @@ public class dbContract {
         public static final String COL_IMAGE_5 = "Image";
         public static final String COL_ISFAV_6 = "isFav";
 
-        //add to fave receiver action
+        //favorites receiver action
         public static final String ACTION_FAVED = "com.avigezerit.myfaves.FAVED";
-
-        //remove from fave receiver action
-        public static final String ACTION_UNFAVED = "com.avigezerit.myfaves.UNFAVED";
 
     }
 

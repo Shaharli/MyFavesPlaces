@@ -46,11 +46,7 @@
         </receiver>
 
         <receiver android:name=".Control.mReceivers.PowerConnectionReceiver" />
-        <receiver android:name=".Control.mReceivers.InternetConnectionReceiver" >
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".Control.mReceivers.InternetConnectionReceiver" />
         <!--PROVIDERS-->
 
         <provider

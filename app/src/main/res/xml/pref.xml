@@ -2,18 +2,18 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
+        android:key="unit"
         android:defaultValue="Kilometers"
         android:dialogTitle="Measurement Units"
-        android:key="unit"
         android:summary="Kilometers"
-        android:title="Measurement Units" />
+        android:title="@string/pref_unit" />
 
     <Preference
         android:key="clear"
-        android:title="Clear Faves List" />
+        android:title="@string/pref_clear_fav" />
 
     <Preference
         android:key="exit"
-        android:title="Save and Exit" />
+        android:title="@string/pref_save" />
 
 </PreferenceScreen>

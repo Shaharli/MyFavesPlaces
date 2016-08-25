@@ -65,9 +65,11 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     int rs = 1;
     getLocationHelper helper;
 
-    //charging alert
+    //charging & internet alert
     PowerConnectionReceiver powerReceiver;
     InternetConnectionReceiver internetReceiver;
+    boolean receiversRegistered = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,15 +124,15 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
         //power connection
         powerReceiver = new PowerConnectionReceiver();
-        IntentFilter powerConnectedIF = new IntentFilter("com.avigezerit.myfaves.action.ACTION_POWER_CONNECTED");
-        IntentFilter powerDisconnectedIF = new IntentFilter("com.avigezerit.myfaves.action.ACTION_POWER_DISCONNECTED");
+        IntentFilter powerConnectedIF = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(powerReceiver, powerConnectedIF);
-        registerReceiver(powerReceiver, powerDisconnectedIF);
 
         //internet connection
         internetReceiver = new InternetConnectionReceiver();
-        IntentFilter internetDisconnectedIF = new IntentFilter("com.avigezerit.myfaves.action.ACTION_POWER_CONNECTED");
+        IntentFilter internetDisconnectedIF = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(internetReceiver, internetDisconnectedIF);
+
+        receiversRegistered = true;
 
     }
 
@@ -159,7 +161,16 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
         return isLanscapeMode;
     }
 
-    //// MAP FRAG INTERFACE METHOD ////
+    private void writeToSharedPref(int rs) {
+        //saving radius for app-level use
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("rs", rs);
+        editor.commit();
+
+    }
+
+    //// LOAD MAP FRAG INTERFACE ////
 
     @Override
     public void loadMapOfSelectedPlace(final String placeName, final LatLng placeCoordinates) {
@@ -229,17 +240,17 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
         //unregister receiver to avoid harassment!
-        if (powerReceiver != null) {
-            Log.d(TAG, "unregistered power");
+        if (receiversRegistered && powerReceiver!=null && internetReceiver!=null) {
+            Log.d(TAG, "unregistered power & internet");
             unregisterReceiver(powerReceiver);
-        }
-        if (internetReceiver != null) {
-            Log.d(TAG, "unregistered internet");
             unregisterReceiver(internetReceiver);
+            powerReceiver=null;
+            powerReceiver=null;
         }
-        super.onDestroy();
+
+        super.onPause();
     }
 
     //// UI EVENTS ////
@@ -279,10 +290,10 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
             //go to search
             startService(intent);
 
-            Toast.makeText(this, "Fetching Results...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.fetching_results_alert, Toast.LENGTH_SHORT).show();
 
         } else {
-            searchTIL.setError("Requires at least 2 characters");
+            searchTIL.setError(getString(R.string.search_error));
         }
 
 
@@ -305,18 +316,8 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
-        Toast.makeText(this, "Radius set to: " + rs + "Meters", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.radius_set_alert) + rs + getString(R.string.meters), Toast.LENGTH_SHORT).show();
         writeToSharedPref(rs);
-
-    }
-
-    //saving radius for app-level use
-    private void writeToSharedPref(int rs) {
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("rs", rs);
-        editor.commit();
 
     }
 
@@ -336,9 +337,11 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
     }
 
-    //check and request for location permission
+    //// PERMISSIONS - M ////
+
     public void checkPermission() {
 
+        //check and request for location permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
