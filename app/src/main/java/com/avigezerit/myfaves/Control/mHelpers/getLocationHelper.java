@@ -59,15 +59,16 @@ public class getLocationHelper extends FragmentActivity implements android.locat
             //set to provider
             provider = locationManager.getBestProvider(criteria, true);
 
-            Log.d(TAG, "provider: "+ provider);
+            Log.d(TAG, "provider: " + provider);
 
             locationManager.requestLocationUpdates(provider, 4000, 1, this);
 
             Location location = locationManager.getLastKnownLocation(provider);
 
-            Log.d(TAG, "lat: "+ location.getLatitude() + " lng: " + location.getLongitude());
-
-            writeToSharedPref(location.getLatitude(), location.getLongitude());
+            if (location != null) {
+                Log.d(TAG, "lat: " + location.getLatitude() + " lng: " + location.getLongitude());
+                writeToSharedPref(location.getLatitude(), location.getLongitude());
+            }
         }
     }
 
@@ -88,7 +89,7 @@ public class getLocationHelper extends FragmentActivity implements android.locat
     public void onLocationChanged(Location location) {
 
         if (location != null) {
-            Log.d(TAG, "lat: "+ location.getLatitude() + " lng: " + location.getLongitude());
+            Log.d(TAG, "lat: " + location.getLatitude() + " lng: " + location.getLongitude());
             writeToSharedPref(location.getLatitude(), location.getLongitude());
         }
     }

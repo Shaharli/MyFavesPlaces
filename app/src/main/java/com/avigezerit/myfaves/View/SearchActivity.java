@@ -331,7 +331,7 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
             helper = new getLocationHelper();
             helper.setContext(this, this);
             checkPermission();
-            helper.getCurrentLocation();
+            //helper.getCurrentLocation();
             rsbLL.setVisibility(View.VISIBLE);
         }
 
@@ -350,8 +350,8 @@ public class SearchActivity extends AppCompatActivity implements LoadMapIF, View
 
                 ActivityCompat.requestPermissions(this, locationPermissions, helper.REQUEST_LOCATION_PERMISSION);
 
-            }
-        }
+            } else helper.getCurrentLocation();
+        } else helper.getCurrentLocation();
     }
 
     @Override
